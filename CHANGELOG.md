@@ -2,6 +2,10 @@
 
 본 프로젝트의 모든 주요 변경사항을 이 파일에 기록합니다.
 
+## [v4.4.17] - 2026-05-18
+- fix: next.config.mjs에 ESLint/TypeScript 빌드 우회 설정 적용 (이전 v4.4.16에서 잘못된 .js 파일 수정한 것 수정)
+- chore: 중복된 next.config.js 파일 제거
+
 ## [v4.4.16] - 2026-05-18
 - fix: Vercel 배포 빌드 실패 해결 (ESLint/TypeScript 검사 빌드 중 우회)
 - chore: next.config.mjs에 ignoreDuringBuilds, ignoreBuildErrors 추가
