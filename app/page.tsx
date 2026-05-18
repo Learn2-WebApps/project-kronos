@@ -1,101 +1,169 @@
+'use client';
+
+import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CHARACTERS, getCharacterImage, getCharacterOrder, CharacterId } from "@/lib/character-assets";
+import { useInterviewStore, MAX_TURNS_PER_CHARACTER } from "@/store/interview-store";
+import { usePlayerStore } from "@/store/player-store";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter();
+  const { isUnlocked, characterTurns, isCharacterExhausted } = useInterviewStore();
+  const { sessionCode, name, department, hasSubmitted } = usePlayerStore();
+  
+  const order = getCharacterOrder();
+  const hasStartedTutorial = isUnlocked('kang-hyerin'); // 한지훈과 1턴 이상 대화 시 해제됨
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (!sessionCode) {
+      router.replace('/entry');
+    } else if (hasSubmitted) {
+      router.replace('/result');
+    }
+  }, [sessionCode, hasSubmitted, router]);
+
+  if (!sessionCode) return null;
+
+  return (
+    <main className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-[var(--font-main)] relative overflow-hidden flex flex-col items-center p-8 lg:p-16">
+      {/* 그레인 오버레이 */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+      
+      {/* 비네팅 */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]"></div>
+
+      <header className="z-10 w-full max-w-7xl flex flex-col md:flex-row md:justify-between items-center mb-12 gap-4">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--accent-amber)] uppercase font-[var(--font-mono)]">
+          Project KRONOS <span className="text-[var(--text-muted)] ml-2 text-sm font-normal">v4.4 System Active</span>
+        </h1>
+        <div className="text-sm font-[var(--font-mono)] text-[var(--text-secondary)] bg-black/40 px-4 py-2 border border-[var(--border-subtle)] rounded-sm">
+          {name} | {department} | Session: {sessionCode}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      <div className="z-10 w-full max-w-7xl">
+        <div className="mb-8 flex justify-between items-end">
+          <div>
+            <h2 className="text-4xl font-bold mb-2">용의자 선택</h2>
+            <p className="text-[var(--text-secondary)] mb-4">조사할 캐릭터를 선택하여 인터뷰를 시작하십시오.</p>
+            
+            {!hasStartedTutorial && (
+              <div className="tutorial-hint p-3 bg-amber-900/20 border border-amber-500/30 rounded-sm text-sm inline-block">
+                먼저 <strong style={{ color: CHARACTERS['han-jihun'].color }}>한지훈</strong>과 대화하여 사건의 개요를 파악하세요.
+              </div>
+            )}
+          </div>
+          
+          {hasStartedTutorial && (
+            <Link 
+              href="/submit"
+              className="px-6 py-3 bg-[var(--accent-amber)] text-black font-bold uppercase tracking-widest text-sm rounded-sm hover:opacity-90 transition-opacity mb-4"
+            >
+              최종 답안 제출하기
+            </Link>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 h-[600px]">
+          {order.map((id) => {
+            const character = CHARACTERS[id];
+            const unlocked = isUnlocked(id);
+            const turns = characterTurns[id] || 0;
+            const exhausted = isCharacterExhausted(id);
+
+            const cardContent = (
+              <>
+                <div className={`turn-badge ${exhausted ? 'completed' : ''}`}>
+                  {turns} / {MAX_TURNS_PER_CHARACTER}
+                </div>
+                <Image
+                  src={getCharacterImage.background(id)}
+                  alt={character.name}
+                  fill
+                  className={`object-cover transition-transform duration-500 ${unlocked && !exhausted ? 'group-hover:scale-105' : ''}`}
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,0.9)] via-[rgba(10,10,10,0.3)] to-transparent" />
+                <div className="absolute bottom-0 left-0 p-6 w-full">
+                  <div 
+                    className="w-12 h-1 mb-3" 
+                    style={{ backgroundColor: character.color }}
+                  />
+                  <h3 className="text-2xl font-bold mb-1">{character.name}</h3>
+                  <p className="text-sm text-[var(--text-secondary)] font-[var(--font-serif)]">{character.role}</p>
+                </div>
+                {!unlocked && (
+                  <div className="lock-overlay">
+                    <div className="lock-icon">🔒</div>
+                    <div className="lock-message">한지훈과 먼저 대화하세요</div>
+                  </div>
+                )}
+                {exhausted && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 px-4 py-2 border border-white/20 rounded-sm text-[10px] uppercase tracking-[0.2em] font-bold text-white/60 pointer-events-none z-30">
+                    Interview Ended
+                  </div>
+                )}
+                {unlocked && !exhausted && (
+                  <div 
+                    className="absolute inset-0 border-2 border-transparent group-hover:border-[var(--accent-amber)] opacity-0 group-hover:opacity-40 transition-all duration-300 pointer-events-none"
+                  />
+                )}
+              </>
+            );
+
+            if (unlocked) {
+              return (
+                <Link
+                  key={id}
+                  href={`/interview/${id}`}
+                  className={`suspect-select-card relative group cursor-pointer overflow-hidden rounded-sm border border-[var(--border-subtle)] transition-all duration-300 ${!exhausted ? 'hover:translate-y-[-8px] hover:shadow-[0_0_32px_rgba(212,165,116,0.2)]' : 'exhausted opacity-70'}`}
+                  data-character={id}
+                >
+                  {cardContent}
+                </Link>
+              );
+            } else {
+              return (
+                <div
+                  key={id}
+                  className="suspect-select-card locked relative group overflow-hidden rounded-sm border border-[var(--border-subtle)] transition-all duration-300"
+                  data-character={id}
+                >
+                  {cardContent}
+                </div>
+              );
+            }
+          })}
+        </div>
+      </div>
+
+      <footer className="z-10 mt-16 flex justify-between w-full max-w-7xl text-[var(--text-muted)] text-sm font-[var(--font-mono)]">
+        <span>SYSTEM READY // PHASE 4 ACTIVE: EVALUATION SYSTEM ENABLED</span>
       </footer>
-    </div>
+
+      <Link 
+        href="/admin/login" 
+        className="admin-entry-link"
+      >
+        Instructor Access
+      </Link>
+
+      {/* 에코 마스코트 (ECHO 진입) */}
+      <Link href="/echo" className="fixed bottom-8 right-8 z-30 transition-transform hover:scale-110 active:scale-95 group">
+        <div className="relative w-24 h-24 rounded-full border-2 border-[var(--accent-amber)] bg-[var(--bg-elevated)] shadow-[0_0_32px_rgba(212,165,116,0.3)] overflow-hidden">
+          <Image
+            src="/characters/echo.png"
+            alt="ECHO"
+            fill
+            className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+          />
+        </div>
+        <div className="absolute -top-1 -left-1 bg-red-500 border-2 border-[var(--bg-base)] text-[8px] font-bold text-white px-2 py-0.5 rounded-full uppercase tracking-tighter animate-pulse">
+          ECHO Active
+        </div>
+      </Link>
+    </main>
   );
 }

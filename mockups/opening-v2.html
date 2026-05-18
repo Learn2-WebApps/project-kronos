@@ -1,0 +1,658 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project KRONOS - Case Briefing v2.0</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 디지털 다크 (배경) */
+            --bg-base: #0a0a0a;
+
+            /* 텍스트 */
+            --text-primary: #f0ebe0;
+            --text-secondary: #a8a29a;
+            --text-muted: #6b6660;
+
+            /* 종이 (기록물) */
+            --paper-base: #ede4d5;
+            --paper-shadow: #c9bfa8;
+            --paper-ink: #2a2520;
+            --paper-ink-faded: #5a544a;
+            --paper-accent: #8b6f47;
+
+            /* 액센트 */
+            --accent-amber: #d4a574;
+            --accent-danger: #c9483d;
+            --accent-leather: #4a3828;
+            --accent-brass: #b8945a;
+
+            /* 캐릭터 테마 */
+            --char-jung: #c97a3a;
+            --char-han: #5a8cc9;
+            --char-yoon: #9b6fb8;
+            --char-kang: #6ba373;
+            --char-oh: #c95a7a;
+
+            /* Typography Scaling */
+            --font-main: 'Pretendard', sans-serif;
+            --font-serif: 'Noto Serif KR', serif;
+            --font-hand: 'Gaegu', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 5vh 0;
+        }
+
+        /* 전역 그레인 오버레이 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 중앙 비네팅 */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* 메인 종이 카드 */
+        .briefing-card {
+            width: 90vw;
+            max-width: 880px;
+            min-height: 720px;
+            background-color: var(--paper-base);
+            box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px var(--paper-shadow);
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+            transform: rotate(-0.3deg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 종이 질감 효과 */
+        .briefing-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.12;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+        }
+
+        /* 미세 얼룩 */
+        .paper-stains {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(139, 111, 71, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 111, 71, 0.04) 0%, transparent 30%);
+        }
+
+        /* 찢어진 가장자리 마스크 */
+        .briefing-card {
+            clip-path: polygon(
+                0% 0.5%, 3% 0%, 7% 0.3%, 12% 0%, 18% 0.4%, 25% 0.1%, 33% 0.5%, 42% 0%, 50% 0.3%, 58% 0.1%, 67% 0.4%, 76% 0%, 85% 0.3%, 93% 0.1%, 100% 0.5%,
+                100% 99.5%, 93% 100%, 85% 99.7%, 76% 100%, 67% 99.6%, 58% 99.9%, 50% 99.7%, 42% 100%, 33% 99.5%, 25% 99.9%, 18% 99.6%, 12% 100%, 7% 99.7%, 3% 100%, 0% 99.5%
+            );
+        }
+
+        /* 상단 헤더 */
+        .card-header {
+            height: 120px;
+            padding: 0 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--paper-shadow);
+            position: relative;
+            z-index: 5;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .company-mark {
+            width: 32px;
+            height: 32px;
+            color: var(--paper-accent);
+        }
+
+        .company-info .brand {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--paper-ink);
+        }
+
+        .company-info .dept {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .doc-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+        }
+
+        .case-number {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin: 2px 0;
+        }
+
+        .doc-date {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+        }
+
+        /* 기밀 도장 */
+        .confidential-stamp {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            transform: rotate(-12deg);
+            mix-blend-mode: multiply;
+            opacity: 0.7;
+            z-index: 20;
+        }
+
+        /* 본문 영역 */
+        .card-body {
+            padding: 48px 64px;
+            flex: 1;
+            position: relative;
+            z-index: 5;
+        }
+
+        .title-block {
+            margin-bottom: 32px;
+        }
+
+        .title-block h1 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--paper-ink);
+            line-height: 1.3;
+        }
+
+        .title-block .subtitle {
+            font-family: var(--font-main);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 4px;
+        }
+
+        .auditor-block {
+            margin-bottom: 40px;
+        }
+
+        .auditor-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .auditor-name {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--paper-ink);
+            padding-left: 12px;
+            border-left: 2px solid var(--accent-amber);
+        }
+
+        .overview-box {
+            padding-left: 20px;
+            border-left: 3px solid var(--paper-accent);
+            margin-bottom: 40px;
+        }
+
+        .overview-box p {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--paper-ink);
+            margin-bottom: 12px;
+        }
+
+        .highlight {
+            background: rgba(212, 165, 116, 0.4);
+            padding: 0 2px;
+        }
+
+        .hand-memo {
+            font-family: var(--font-hand);
+            font-size: 20px;
+            color: var(--accent-danger);
+            transform: rotate(-2deg);
+            opacity: 0.85;
+            margin-top: 24px;
+        }
+
+        /* 용의자 섹션 */
+        .poi-section {
+            margin-top: 48px;
+        }
+
+        .poi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .poi-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+        }
+
+        .poi-count {
+            font-family: var(--font-hand);
+            font-size: 14px;
+            color: var(--paper-accent);
+            transform: rotate(-1deg);
+        }
+
+        .poi-list {
+            display: flex;
+            gap: 12px;
+        }
+
+        .poi-card {
+            flex: 1;
+            height: 240px;
+            background-color: rgba(255, 252, 245, 0.6);
+            border: 1px solid rgba(139, 111, 71, 0.2);
+            border-radius: 2px;
+            padding: 12px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .poi-pin {
+            position: absolute;
+            left: 50%;
+            top: -6px;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent-brass), var(--accent-leather));
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .poi-photo {
+            width: 100%;
+            height: 140px;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            top: 12px;
+            left: 0;
+            z-index: 1;
+        }
+
+        .poi-name {
+            font-family: var(--font-serif);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin-bottom: 2px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .poi-job {
+            font-family: var(--font-main);
+            font-size: 10px;
+            color: var(--paper-ink-faded);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .poi-memo {
+            font-family: var(--font-hand);
+            font-size: 12px;
+            color: var(--paper-accent);
+            line-height: 1.2;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 하단 액션 영역 */
+        .card-footer {
+            padding: 32px 64px 40px;
+            border-top: 1px solid rgba(139, 111, 71, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: relative;
+            z-index: 5;
+        }
+
+        .rules-summary {
+            background-color: rgba(139, 111, 71, 0.08);
+            border-left: 2px solid var(--paper-accent);
+            padding: 12px 16px;
+            max-width: 400px;
+        }
+
+        .rules-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .rules-text {
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: var(--paper-ink);
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .btn-text {
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: var(--paper-ink-faded);
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+        }
+        .btn-text:hover { border-bottom-color: var(--paper-ink-faded); }
+
+        .btn-leather {
+            background: linear-gradient(180deg, var(--accent-brass) 0%, var(--accent-leather) 100%);
+            color: #f5ebd8;
+            padding: 14px 40px;
+            border-radius: 4px;
+            border: 1px dashed rgba(245, 235, 216, 0.4);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-leather:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+        }
+
+        /* 가상 서명 */
+        .signature-area {
+            position: absolute;
+            left: 64px;
+            bottom: 40px;
+            pointer-events: none;
+        }
+
+        .signer-name {
+            font-family: var(--font-hand);
+            font-size: 16px;
+            color: var(--paper-ink-faded);
+            transform: rotate(-3deg);
+            opacity: 0.7;
+        }
+
+        .signature-svg {
+            width: 100px;
+            height: 40px;
+            color: var(--paper-ink-faded);
+            opacity: 0.5;
+            margin-top: -10px;
+        }
+
+        /* 페이지 접힘 */
+        .page-fold {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            z-index: 20;
+        }
+        .page-fold::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 24px 24px 0;
+            border-style: solid;
+            border-color: transparent transparent var(--paper-shadow) transparent;
+            filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.1));
+        }
+
+        /* SVG Icon Class */
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="briefing-card">
+        <div class="paper-stains"></div>
+        <div class="page-fold"></div>
+
+        <!-- Header -->
+        <header class="card-header">
+            <div class="header-left">
+                <svg class="company-mark" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <div class="company-info">
+                    <div class="brand">NOVATECH</div>
+                    <div class="dept">Internal Audit Division</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="doc-label">Case File No.</div>
+                <div class="case-number">2026-K-0413</div>
+                <div class="doc-date">2026.05.13</div>
+            </div>
+        </header>
+
+        <!-- Confidential Stamp -->
+        <svg class="confidential-stamp" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="var(--accent-danger)" stroke-width="2" stroke-dasharray="4 2"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent-danger)" stroke-width="1"/>
+            <path id="circlePath" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="none"/>
+            <text font-family="Pretendard" font-size="10" font-weight="700" fill="var(--accent-danger)">
+                <textPath xlink:href="#circlePath" startOffset="0%">기밀 · CONFIDENTIAL · 기밀 · CONFIDENTIAL · </textPath>
+            </text>
+            <text x="50" y="55" text-anchor="middle" font-family="Pretendard" font-size="14" font-weight="900" fill="var(--accent-danger)">기밀</text>
+        </svg>
+
+        <!-- Body -->
+        <main class="card-body">
+            <div class="title-block">
+                <h1>한지훈 상무 부당해고 의혹 사건</h1>
+                <div class="subtitle">Wrongful Dismissal Investigation</div>
+            </div>
+
+            <div class="auditor-block">
+                <span class="auditor-label">담당 감사관</span>
+                <div class="auditor-name">[감사관]</div>
+            </div>
+
+            <div class="overview-box">
+                <p>본사 윤리감실은 익명 제보를 통해 NovaTech 한지훈 상무의 해임 절차에 중대한 부정행위가 개입되었을 가능성을 인지하였다.</p>
+                <p>제보에 따르면 해임의 결정적 근거가 된 <span class="highlight">12장의 영수증</span> 중 일부가 <span class="highlight">위조</span>되었을 가능성이 제기되었으며, 이는 명백한 <span class="highlight">무고 행위</span>로 판단된다.</p>
+                <p>귀하는 본 사건의 진상을 규명하고, 실제 가해자를 특정하여 보고할 책임을 부여받았다.</p>
+            </div>
+
+            <div class="hand-memo">※ 외부 누설 금지. 5일 이내 보고 요망.</div>
+
+            <!-- Persons of Interest -->
+            <section class="poi-section">
+                <div class="poi-header">
+                    <span class="poi-label">관련 인물 · Persons of Interest</span>
+                    <span class="poi-count">총 5명</span>
+                </div>
+                <div class="poi-list">
+                    <!-- POI Card 1 -->
+                    <div class="poi-card" style="transform: rotate(0.5deg)">
+                        <div class="poi-pin"></div>
+                        <img src="../assets/characters/jung-minho.png" alt="정민호" class="poi-photo" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">정민호</div>
+                        <div class="poi-job">전략기획팀장</div>
+                        <div class="poi-memo">한지훈과 식사한 마지막 인물</div>
+                    </div>
+                    <!-- POI Card 2 -->
+                    <div class="poi-card" style="transform: rotate(-0.8deg)">
+                        <div class="poi-pin"></div>
+                        <img src="../assets/characters/han-jihun.png" alt="한지훈" class="poi-photo" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">한지훈</div>
+                        <div class="poi-job">전 상무 (피해자)</div>
+                        <div class="poi-memo">해임 당사자, 진술 확보</div>
+                    </div>
+                    <!-- POI Card 3 -->
+                    <div class="poi-card" style="transform: rotate(0.3deg)">
+                        <div class="poi-pin"></div>
+                        <img src="../assets/characters/yoon-seokyung.png" alt="윤서경" class="poi-photo" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">윤서경</div>
+                        <div class="poi-job">사업본부장</div>
+                        <div class="poi-memo">한지훈과 라이벌 관계</div>
+                    </div>
+                    <!-- POI Card 4 -->
+                    <div class="poi-card" style="transform: rotate(-0.4deg)">
+                        <div class="poi-pin"></div>
+                        <img src="../assets/characters/kang-hyerin.png" alt="강혜린" class="poi-photo" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">강혜린</div>
+                        <div class="poi-job">인사팀 차장</div>
+                        <div class="poi-memo">해임 절차 직접 처리</div>
+                    </div>
+                    <!-- POI Card 5 -->
+                    <div class="poi-card" style="transform: rotate(1.1deg)">
+                        <div class="poi-pin"></div>
+                        <img src="../assets/characters/oh-sera.png" alt="오세라" class="poi-photo" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">오세라</div>
+                        <div class="poi-job">티타니아 부사장</div>
+                        <div class="poi-memo">경쟁사 핵심 인물</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="card-footer">
+            <div class="rules-summary">
+                <span class="rules-label">조사 규칙</span>
+                <div class="rules-text">용의자별 최대 10회 질문 · 전체 시간 30~40분 · ECHO 보조 무제한</div>
+            </div>
+
+            <div class="action-group">
+                <a href="#" class="btn-text">사건 자료 다시 보기</a>
+                <button class="btn-leather">
+                    조사 시작
+                    <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+            </div>
+
+            <div class="signature-area">
+                <div class="signer-name">이지원 / 윤리감사실장</div>
+                <svg class="signature-svg" viewBox="0 0 100 40">
+                    <path d="M10 25c5-2 15-10 25-5s10 15 30 5 20-15 25-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M20 20c10 5 40 5 50-10" fill="none" stroke="currentColor" stroke-width="1" stroke-opacity="0.5"/>
+                </svg>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
+   </footer>
+    </div>
+
+</body>
+</html>
+
+

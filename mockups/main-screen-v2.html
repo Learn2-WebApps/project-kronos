@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project KRONOS - Cinematic Mockup v2.5</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 디지털 다크 (대화·UI) */
+            --bg-base: #0a0a0a;
+            --bg-elevated: #1a1a1a;
+            --bg-card: #2a2a2a;
+            --bg-bubble: #2a2a2a;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-default: rgba(255, 255, 255, 0.12);
+
+            /* 텍스트 */
+            --text-primary: #f0ebe0;
+            --text-secondary: #a8a29a;
+            --text-muted: #6b6660;
+
+            /* 종이 (기록물) */
+            --paper-base: #ede4d5;
+            --paper-shadow: #c9bfa8;
+            --paper-ink: #2a2520;
+            --paper-ink-faded: #5a544a;
+            --paper-accent: #8b6f47;
+
+            /* 액센트 */
+            --accent-amber: #d4a574;
+            --accent-amber-bright: #e8b888;
+            --accent-danger: #c9483d;
+            --accent-leather: #4a3828;
+            --accent-brass: #b8945a;
+
+            /* 캐릭터 테마 (이름표·말풍선 보더) */
+            --char-jung: #c97a3a;     /* 정민호 - 앰버 */
+            --char-han: #5a8cc9;      /* 한지훈 - 블루 */
+            --char-yoon: #9b6fb8;     /* 윤서경 - 퍼플 */
+            --char-kang: #6ba373;     /* 강혜린 - 그린 */
+            --char-oh: #c95a7a;       /* 오세라 - 로즈 */
+            --char-echo: #d4a574;     /* ECHO - 앰버 */
+
+            /* Typography Scaling */
+            --font-main: 'Pretendard', sans-serif;
+            --font-serif: 'Noto Serif KR', serif;
+            --font-hand: 'Gaegu', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 전역 그레인 오버레이 */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 1. 상단 바 (56px) */
+        .top-bar {
+            height: 56px;
+            background-color: var(--bg-base);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 24px;
+            z-index: 100;
+        }
+
+        .menu-btn {
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            color: var(--accent-amber);
+            opacity: 1.0;
+            text-transform: uppercase;
+        }
+
+        .timer-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 22px;
+            color: var(--text-primary);
+        }
+
+        /* 인벤토리 아이콘 영역 */
+        .inventory-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .inventory-wrapper:hover {
+            color: var(--accent-amber);
+        }
+
+        /* v2.5 Pulse Dot Correction */
+        .pulse-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-amber);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--bg-base);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { 
+                box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 0 rgba(212, 165, 116, 0.6);
+            }
+            50% { 
+                box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 6px rgba(212, 165, 116, 0);
+            }
+        }
+
+        /* 2. 일러스트 영역 (50%) */
+        .illustration-area {
+            height: calc((100vh - 56px) * 0.5);
+            min-height: 360px;
+            background-color: var(--bg-base);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+        }
+
+        .illustration-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, var(--bg-base) 0%, #1a1820 50%, var(--bg-base) 100%);
+            z-index: 1;
+        }
+
+        .illustration-area::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .fade-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 16px;
+            z-index: 10;
+        }
+        .fade-top { top: 0; background: linear-gradient(to bottom, var(--bg-base), transparent); }
+        .fade-bottom { bottom: 0; background: linear-gradient(to top, var(--bg-base), transparent); }
+
+        .character-illustration {
+            width: auto;
+            height: 90%;
+            object-fit: contain;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* v2.5 Turn Indicator Implementation */
+        .turn-indicator {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .turn-line {
+            width: 2px;
+            height: 44px;
+            background-color: var(--char-jung);
+        }
+
+        .turn-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .turn-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 500;
+        }
+
+        .turn-numbers {
+            font-family: var(--font-mono);
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .turn-current { color: var(--accent-amber); }
+        .turn-total { color: var(--text-secondary); }
+
+        /* 3. 채팅 영역 (50%) */
+        .chat-area {
+            height: calc((100vh - 56px) * 0.5);
+            min-height: 360px;
+            background-color: var(--bg-elevated);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 880px;
+            flex: 1;
+            padding: 20px 32px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            gap: 16px;
+        }
+
+        .system-msg {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            width: 100%;
+            margin: 12px 0;
+            justify-content: center;
+        }
+        .system-msg::before, .system-msg::after {
+            content: "";
+            flex: 1;
+            max-width: 120px;
+            height: 1px;
+            background-color: var(--border-default);
+        }
+
+        .system-msg-text {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--accent-amber);
+            white-space: nowrap;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 560px;
+        }
+
+        .msg-char { align-self: flex-start; }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--char-jung);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .bubble-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .name-tag {
+            background-color: var(--char-jung);
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 2px;
+            width: fit-content;
+        }
+
+        .bubble {
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: var(--bg-bubble);
+            color: var(--text-primary);
+            border-radius: 4px 14px 14px 14px;
+        }
+
+        .msg-user { align-self: flex-end; }
+        .msg-user .bubble {
+            background-color: var(--accent-amber-bright);
+            color: #0a0a0a;
+            border-radius: 14px 4px 14px 14px;
+        }
+
+        /* 입력창 영역 */
+        .input-wrapper {
+            width: 100%;
+            max-width: 880px;
+            padding: 0 32px 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .input-box {
+            flex: 1;
+            height: 56px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px 0 24px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-info-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 4px;
+        }
+
+        .turns-remaining-inline {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-amber);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .send-btn:hover { transform: scale(1.05); }
+
+        /* 4. ECHO 마스코트 */
+        .echo-mascot {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-brass) 0%, var(--accent-leather) 100%);
+            border: 2px solid var(--accent-amber);
+            box-shadow: 0 0 16px rgba(212, 165, 116, 0.3), 0 4px 12px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 28px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+        .echo-mascot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 24px rgba(212, 165, 116, 0.5), 0 6px 16px rgba(0,0,0,0.6);
+        }
+
+        /* 5. 단서 토스트 (종이 기록물) */
+        .clue-toast {
+            position: fixed;
+            top: 72px;
+            right: 24px;
+            width: 360px;
+            height: 96px;
+            background-color: #ede4d5;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--paper-shadow);
+            border-radius: 2px;
+            padding: 16px 44px 16px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 500;
+            overflow: hidden;
+        }
+
+        .clue-toast::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+            opacity: 0.10;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+        .clue-toast {
+            clip-path: polygon(
+                0% 0%, 100% 0%, 100% 100%, 0% 100%, 
+                0% 85%, 2% 82%, 0% 78%, 1% 72%, 0% 68%, 2% 62%, 0% 55%, 1% 48%, 0% 42%, 2% 35%, 0% 28%, 1% 22%, 0% 15%
+            );
+        }
+
+        .brass-pin {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent-brass), var(--accent-leather));
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+        }
+
+        .toast-label {
+            font-family: var(--font-serif);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--paper-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .toast-content {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--paper-ink);
+            line-height: 1.3;
+            max-width: 280px;
+        }
+
+        /* SVG Icons */
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <div class="menu-btn">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </div>
+        <div class="logo">PROJECT KRONOS</div>
+        <div class="timer-container">
+            <svg class="icon" style="color: var(--accent-amber);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>27:43</span>
+        </div>
+        <div class="inventory-wrapper">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            <div class="pulse-dot"></div>
+        </div>
+    </header>
+
+    <!-- Illustration Area (50%) -->
+    <section class="illustration-area">
+        <div class="illustration-bg"></div>
+        <div class="fade-overlay fade-top"></div>
+        
+        <img src="../assets/characters/jung-minho-normal.png" alt="정민호" class="character-illustration" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+
+        <div class="turn-indicator">
+            <div class="turn-line"></div>
+            <div class="turn-info">
+                <div class="turn-label">남은 턴</div>
+                <div class="turn-numbers"><span class="turn-current">7</span> <span class="turn-total">/ 10</span></div>
+            </div>
+        </div>
+
+        <div class="fade-overlay fade-bottom"></div>
+    </section>
+
+    <!-- Chat Area (50%) -->
+    <section class="chat-area">
+        <div class="chat-container">
+            <div class="system-msg">
+                <span class="system-msg-text">정민호와의 인터뷰</span>
+            </div>
+
+            <!-- Character Message -->
+            <div class="message msg-char">
+                <div class="profile-icon">정</div>
+                <div class="bubble-wrapper">
+                    <div class="name-tag">정민호</div>
+                    <div class="bubble">그날 저녁 9시쯤 식사를 마치고 바로 집으로 갔습니다. 별다른 일은 없었어요.</div>
+                </div>
+            </div>
+
+            <!-- User Message -->
+            <div class="message msg-user">
+                <div class="bubble">그럼 9시 이후에는 어디 계셨나요? 누구와 함께 있었는지도 알려주세요.</div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-wrapper">
+            <div class="input-box">
+                <input type="text" class="chat-input" placeholder="정민호에게 질문하기...">
+                <div class="input-info-group">
+                    <div class="turns-remaining-inline">7 / 10</div>
+                    <button class="send-btn">
+                        <svg class="icon" style="width: 18px; height: 18px;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ECHO Mascot -->
+    <img src="../assets/characters/echo.png" alt="ECHO" class="echo-mascot" onerror="this.style.opacity=0.2; this.alt='ECHO 누락'">
+
+    <!-- Clue Toast (Paper Record) -->
+    <div class="clue-toast">
+        <div class="brass-pin"></div>
+        <div class="toast-label">
+            <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            새 단서 발견
+        </div>
+        <div class="toast-content">L-01 식사 종료 시각 불일치</div>
+    </div>
+
+</body>
+</html>

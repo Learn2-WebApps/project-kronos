@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project KRONOS - Investigation Diary v2.0</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 디지털 다크 (배경) */
+            --bg-base: #0a0a0a;
+            --bg-overlay: rgba(10, 10, 10, 0.85);
+
+            /* 텍스트 */
+            --text-primary: #f0ebe0;
+            --text-secondary: #a8a29a;
+            --text-muted: #6b6660;
+
+            /* 종이 (기록물) */
+            --paper-base: #e8dfd0;
+            --paper-shadow: #c9bfa8;
+            --paper-ink: #2a2520;
+            --paper-ink-faded: #5a544a;
+            --paper-accent: #8b6f47;
+
+            /* 액센트 */
+            --accent-amber: #d4a574;
+            --accent-amber-bright: #e8b888;
+            --accent-danger: #c9483d;
+            --accent-leather: #4a3828;
+            --accent-brass: #b8945a;
+
+            /* Typography Scaling */
+            --font-main: 'Pretendard', sans-serif;
+            --font-serif: 'Noto Serif KR', serif;
+            --font-hand: 'Gaegu', cursive;
+            --font-script: 'Nanum Pen Script', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 전역 그레인 오버레이 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 모달 오버레이 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: var(--bg-overlay);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        /* 노트 컨테이너 */
+        .note-container {
+            width: 90vw;
+            max-width: 1600px;
+            height: 90vh;
+            background-color: var(--paper-base);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px var(--paper-shadow);
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            overflow: hidden;
+            animation: note-appear 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes note-appear {
+            from { opacity: 0; transform: scale(0.98) rotate(-0.5deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        /* 종이 질감 효과 */
+        .note-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.12;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+        }
+
+        /* 미세한 색상 얼룩 */
+        .paper-stains {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 111, 71, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 111, 71, 0.04) 0%, transparent 30%);
+        }
+
+        /* 제본선 */
+        .binding-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--paper-shadow) 10%, var(--paper-shadow) 90%, transparent);
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        .note-left-page { box-shadow: inset -8px 0 16px -8px rgba(0,0,0,0.15); }
+        .note-right-page { box-shadow: inset 8px 0 16px -8px rgba(0,0,0,0.15); }
+
+        /* 황동 핀 */
+        .brass-pin {
+            position: absolute;
+            top: 16px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent-brass), var(--accent-leather));
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.3);
+            z-index: 20;
+        }
+        .pin-left { left: 25%; transform: translateX(-50%); }
+        .pin-right { right: 25%; transform: translateX(50%); }
+
+        /* 페이지 공통 */
+        .page {
+            flex: 1;
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        /* 좌측 페이지 (리스트) */
+        .page-header {
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .header-titles h2 {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--paper-ink);
+        }
+        .header-titles span {
+            font-family: var(--font-main);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+        }
+
+        .clue-total-count {
+            font-family: var(--font-hand);
+            font-size: 16px;
+            color: var(--paper-accent);
+            transform: rotate(-2deg);
+            margin-top: 8px;
+        }
+
+        /* 탭 스타일 (마스킹 테이프) */
+        .tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .tab-item {
+            padding: 8px 16px;
+            background-color: #d9cdb5;
+            color: var(--paper-ink-faded);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            clip-path: polygon(
+                0% 5%, 5% 0%, 95% 2%, 100% 8%,
+                98% 92%, 92% 100%, 8% 97%, 0% 90%
+            );
+            transition: all 0.2s;
+        }
+        .tab-item.active {
+            color: var(--paper-ink);
+            box-shadow: inset 0 -2px 0 var(--accent-amber);
+        }
+
+        .clue-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 12px;
+        }
+
+        /* 단서 카드 */
+        .clue-card {
+            background-color: rgba(255, 252, 245, 0.6);
+            border: 1px solid rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .clue-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.2);
+        }
+        .clue-card.active {
+            background-color: rgba(212, 165, 116, 0.15);
+            border-color: rgba(212, 165, 116, 0.4);
+        }
+
+        .clue-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--paper-accent);
+        }
+        .clue-card.lie::before { background-color: var(--accent-danger); }
+        .clue-card.key::before { background-color: var(--accent-amber); }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .clue-meta { display: flex; align-items: center; gap: 8px; }
+        .clue-code { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--paper-accent); }
+        .clue-category { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--paper-ink-faded); }
+        .clue-owner { font-family: var(--font-hand); font-size: 13px; transform: rotate(-1deg); color: var(--paper-ink); }
+
+        .clue-preview {
+            font-family: var(--font-serif);
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--paper-ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-time { font-family: var(--font-mono); font-size: 10px; color: var(--paper-ink-faded); align-self: flex-end; }
+
+        .active-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-amber);
+        }
+
+        /* 우측 페이지 (상세) */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        .detail-code { font-family: var(--font-mono); font-size: 32px; font-weight: 600; color: var(--paper-ink); }
+        .detail-badge { 
+            background-color: var(--paper-accent); 
+            color: white; 
+            padding: 4px 12px; 
+            font-size: 12px; 
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .testimony-source {
+            font-family: var(--font-hand);
+            font-size: 14px;
+            color: var(--paper-accent);
+            transform: rotate(-1deg);
+            margin-bottom: 12px;
+        }
+
+        /* 캐릭터 프로필 */
+        .character-profile {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            margin-top: -64px;
+            margin-bottom: 16px;
+            gap: 16px;
+        }
+
+        .character-full {
+            width: auto;
+            height: 300px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .character-meta {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+
+        .character-meta h3 {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            color: var(--paper-ink);
+            margin-bottom: 4px;
+        }
+
+        .character-meta p {
+            font-family: var(--font-main);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--paper-ink-faded);
+        }
+
+        .testimony-content {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--paper-ink);
+            padding-left: 16px;
+            border-left: 3px solid var(--paper-accent);
+            margin-bottom: 32px;
+        }
+
+        .highlight {
+            background: rgba(212, 165, 116, 0.4);
+            padding: 0 2px;
+        }
+
+        .related-clues {
+            margin-bottom: 40px;
+        }
+        .related-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 8px;
+            display: block;
+        }
+        .clue-chips { display: flex; gap: 8px; }
+        .clue-chip {
+            padding: 4px 10px;
+            border: 1px solid rgba(139, 111, 71, 0.3);
+            background-color: rgba(255,255,255,0.4);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--paper-ink);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        /* 메모 영역 */
+        .memo-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .memo-label {
+            font-family: var(--font-hand);
+            font-size: 18px;
+            color: var(--paper-accent);
+            transform: rotate(-1deg);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .memo-paper {
+            flex: 1;
+            background: repeating-linear-gradient(transparent 0px, transparent 27px, rgba(139, 111, 71, 0.2) 27px, rgba(139, 111, 71, 0.2) 28px);
+            padding: 12px 16px;
+            font-family: var(--font-hand);
+            font-size: 18px;
+            line-height: 28px;
+            color: var(--paper-ink);
+        }
+
+        /* 하단 액션 영역 */
+        .note-actions {
+            height: 80px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(139, 111, 71, 0.1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .btn-close {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--paper-ink-faded);
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .btn-close:hover { color: var(--paper-ink); }
+
+        .btn-leather {
+            background: linear-gradient(180deg, var(--accent-brass) 0%, var(--accent-leather) 100%);
+            color: #f5ebd8;
+            padding: 12px 32px;
+            border-radius: 4px;
+            border: 1px dashed rgba(245, 235, 216, 0.4);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+        }
+        .btn-leather:active { transform: translateY(1px); box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+
+        /* 페이지 접힘 효과 */
+        .page-fold {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(225deg, transparent 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 100%);
+            z-index: 20;
+        }
+        .page-fold::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 24px 24px 0;
+            border-style: solid;
+            border-color: transparent transparent var(--paper-shadow) transparent;
+        }
+
+        /* SVG Icon Class */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay">
+        <div class="note-container">
+            <div class="paper-stains"></div>
+            <div class="binding-line"></div>
+            
+            <div class="brass-pin pin-left"></div>
+            <div class="brass-pin pin-right"></div>
+
+            <!-- Left Page -->
+            <div class="page note-left-page">
+                <div class="page-header">
+                    <div class="header-titles">
+                        <h2>수사 기록</h2>
+                        <span>Investigation Notes</span>
+                    </div>
+                    <div class="clue-total-count">12 항목 기록됨</div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab-item active">전체</div>
+                    <div class="tab-item">캐릭터별</div>
+                    <div class="tab-item">시간순</div>
+                </div>
+
+                <div class="clue-list">
+                    <div class="clue-card active">
+                        <div class="card-top">
+                            <div class="clue-meta">
+                                <span class="clue-code">F-12</span>
+                                <span class="clue-category">일반 단서</span>
+                            </div>
+                            <span class="clue-owner">정민호</span>
+                        </div>
+                        <div class="clue-preview">"9시쯤 식사를 마치고 헤어졌다고 진술"</div>
+                        <div class="card-time">14:23</div>
+                        <div class="active-indicator">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="clue-card lie">
+                        <div class="card-top">
+                            <div class="clue-meta">
+                                <span class="clue-code">L-01</span>
+                                <span class="clue-category">의도적 거짓말</span>
+                            </div>
+                            <span class="clue-owner">정민호</span>
+                        </div>
+                        <div class="clue-preview">"11시까지 같이 있었다는 진술과 모순"</div>
+                        <div class="card-time">14:28</div>
+                    </div>
+
+                    <div class="clue-card">
+                        <div class="card-top">
+                            <div class="clue-meta">
+                                <span class="clue-code">F-05</span>
+                                <span class="clue-category">일반 단서</span>
+                            </div>
+                            <span class="clue-owner">한지훈</span>
+                        </div>
+                        <div class="clue-preview">"10월 15일 저녁 정민호와 강남에서 식사"</div>
+                        <div class="card-time">14:35</div>
+                    </div>
+
+                    <div class="clue-card key">
+                        <div class="card-top">
+                            <div class="clue-meta">
+                                <span class="clue-code">KEY-2</span>
+                                <span class="clue-category">결정적 단서</span>
+                            </div>
+                            <span class="clue-owner">정민호</span>
+                        </div>
+                        <div class="clue-preview">"위조 영수증 4장 언급 (총 12장 중)"</div>
+                        <div class="card-time">14:42</div>
+                    </div>
+
+                    <div class="clue-card">
+                        <div class="card-top">
+                            <div class="clue-meta">
+                                <span class="clue-code">F-18</span>
+                                <span class="clue-category">일반 단서</span>
+                            </div>
+                            <span class="clue-owner">윤서경</span>
+                        </div>
+                        <div class="clue-preview">"한지훈 상무와 5년간 라이벌 관계"</div>
+                        <div class="card-time">14:51</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Page -->
+            <div class="page note-right-page">
+                <div class="page-fold"></div>
+                
+                <div class="detail-header">
+                    <div class="detail-code">F-12</div>
+                    <div class="detail-badge">일반 단서</div>
+                </div>
+
+                <div class="character-profile">
+                    <img src="../assets/characters/jung-minho.png" alt="정민호" class="character-full" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                    <div class="character-meta">
+                        <h3>정민호</h3>
+                        <p>전략기획팀장</p>
+                    </div>
+                </div>
+
+                <div class="testimony-source">정민호의 진술 중에서</div>
+                <div class="testimony-content">
+                    "그날 저녁 <span class="highlight">9시쯤</span> 식사를 마치고 바로 집으로 갔습니다. 별다른 일은 없었어요."
+                </div>
+
+                <div class="related-clues">
+                    <span class="related-label">관련 단서</span>
+                    <div class="clue-chips">
+                        <div class="clue-chip">L-01</div>
+                        <div class="clue-chip">KEY-1b</div>
+                    </div>
+                </div>
+
+                <div class="memo-area">
+                    <div class="memo-label">
+                        <span>메모</span>
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    </div>
+                    <div class="memo-paper">
+                        정민호 진술 → 9시<br>
+                        한지훈 진술 → 9시<br>
+                        근데 정민호 본인은 '11시까지 같이 있었다'고도 함<br>
+                        ⇒ 거짓말 확정. 왜 시간을 늘리려 했나?
+                    </div>
+                </div>
+
+                <div class="note-actions">
+                    <div class="btn-close">닫기</div>
+                    <button class="btn-leather">조사 계속하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

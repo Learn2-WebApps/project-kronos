@@ -1,0 +1,860 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project KRONOS - Final Report Submission v2.0</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 디지털 다크 (배경) */
+            --bg-base: #0a0a0a;
+
+            /* 텍스트 */
+            --text-primary: #f0ebe0;
+            --text-secondary: #a8a29a;
+            --text-muted: #6b6660;
+
+            /* 종이 (기록물) */
+            --paper-base: #ede4d5;
+            --paper-shadow: #c9bfa8;
+            --paper-ink: #2a2520;
+            --paper-ink-faded: #5a544a;
+            --paper-accent: #8b6f47;
+
+            /* 액센트 */
+            --accent-amber: #d4a574;
+            --accent-danger: #c9483d;
+            --accent-leather: #4a3828;
+            --accent-brass: #b8945a;
+
+            /* 캐릭터 테마 */
+            --char-jung: #c97a3a;
+            --char-han: #5a8cc9;
+            --char-yoon: #9b6fb8;
+            --char-kang: #6ba373;
+            --char-oh: #c95a7a;
+
+            /* Typography Scaling */
+            --font-main: 'Pretendard', sans-serif;
+            --font-serif: 'Noto Serif KR', serif;
+            --font-hand: 'Gaegu', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 5vh 0;
+        }
+
+        /* 전역 그레인 오버레이 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 중앙 비네팅 */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* 메인 보고서 종이 */
+        .report-paper {
+            width: 90vw;
+            max-width: 920px;
+            min-height: 1080px;
+            background-color: var(--paper-base);
+            box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px var(--paper-shadow);
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+            transform: rotate(0.2deg);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 5vh;
+        }
+
+        /* 종이 질감 */
+        .report-paper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.12;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+        }
+
+        /* 미세 얼룩 */
+        .paper-stains {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(139, 111, 71, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 111, 71, 0.04) 0%, transparent 30%);
+        }
+
+        /* 상단 헤더 */
+        .card-header {
+            height: 130px;
+            padding: 32px 48px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--paper-shadow);
+            position: relative;
+            z-index: 5;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .company-mark {
+            width: 24px;
+            height: 24px;
+            color: var(--paper-accent);
+        }
+
+        .company-info .brand {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--paper-ink);
+        }
+
+        .company-info .dept {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .report-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+        }
+
+        .report-number {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin: 2px 0;
+        }
+
+        .submit-date {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+        }
+
+        /* DRAFT 도장 */
+        .draft-stamp {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 160px;
+            height: 60px;
+            border: 4px double var(--accent-danger);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-8deg);
+            mix-blend-mode: multiply;
+            opacity: 0.6;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .draft-stamp span {
+            color: var(--accent-danger);
+            font-family: var(--font-main);
+            font-weight: 900;
+            font-size: 20px;
+            letter-spacing: 0.1em;
+        }
+
+        /* 본문 영역 */
+        .card-body {
+            padding: 32px 64px;
+            flex: 1;
+            position: relative;
+            z-index: 5;
+        }
+
+        .title-section {
+            margin-bottom: 48px;
+        }
+
+        .title-section h1 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--paper-ink);
+            line-height: 1.3;
+        }
+
+        .title-section .subtitle {
+            font-family: var(--font-main);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 4px;
+        }
+
+        .title-section .case-meta {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            color: var(--paper-ink-faded);
+            margin-top: 12px;
+        }
+
+        /* 섹션 라벨 */
+        .section-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .section-guide {
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: var(--paper-ink-faded);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* 가해자 선택 섹션 */
+        .culprit-section {
+            margin-bottom: 48px;
+        }
+
+        .poi-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .poi-radio-card {
+            flex: 1;
+            height: 120px;
+            background-color: rgba(255, 252, 245, 0.6);
+            border: 1px solid rgba(139, 111, 71, 0.2);
+            border-radius: 2px;
+            padding: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .poi-radio-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 111, 71, 0.15);
+        }
+
+        .poi-radio-card.selected {
+            background-color: rgba(212, 165, 116, 0.18);
+            border: 2px solid var(--accent-amber);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.25);
+        }
+
+        .poi-thumb {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            border-radius: 2px;
+        }
+
+        .poi-name {
+            font-family: var(--font-serif);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin-bottom: 2px;
+        }
+
+        .poi-job {
+            font-family: var(--font-main);
+            font-size: 10px;
+            color: var(--paper-ink-faded);
+        }
+
+        .radio-ui {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--paper-shadow);
+            border-radius: 50%;
+        }
+
+        .selected .radio-ui {
+            border-color: var(--accent-amber);
+            background-color: var(--accent-amber);
+        }
+
+        .selected .radio-ui::after {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .brass-pin-mini {
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent-brass), var(--accent-leather));
+            z-index: 5;
+            display: none;
+        }
+        .selected .brass-pin-mini { display: block; }
+
+        /* 증거 선택 섹션 */
+        .evidence-section {
+            margin-bottom: 48px;
+        }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .evidence-checkbox-card {
+            padding: 12px 14px;
+            background-color: rgba(255, 252, 245, 0.5);
+            border: 1px solid rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .evidence-checkbox-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--paper-accent);
+        }
+
+        .evidence-checkbox-card.key::before { background-color: var(--accent-amber); }
+        .evidence-checkbox-card.lie::before { background-color: var(--accent-danger); }
+
+        .evidence-checkbox-card.checked {
+            background-color: rgba(212, 165, 116, 0.12);
+            border: 1.5px solid rgba(212, 165, 116, 0.5);
+        }
+
+        .checkbox-ui {
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--paper-shadow);
+            border-radius: 2px;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .checked .checkbox-ui {
+            background-color: var(--accent-amber);
+            border-color: var(--accent-amber);
+        }
+
+        .checked .checkbox-ui::after {
+            content: "✓";
+            color: white;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .evidence-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .evidence-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .evidence-code {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--paper-accent);
+        }
+
+        .evidence-cat {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--paper-ink-faded);
+        }
+
+        .evidence-text {
+            font-family: var(--font-serif);
+            font-size: 13px;
+            color: var(--paper-ink);
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 추리 서술 섹션 */
+        .reasoning-section {
+            margin-bottom: 48px;
+        }
+
+        .reasoning-input-area {
+            position: relative;
+        }
+
+        .note-paper {
+            min-height: 240px;
+            background: 
+                repeating-linear-gradient(transparent 0px, transparent 27px, rgba(139, 111, 71, 0.2) 27px, rgba(139, 111, 71, 0.2) 28px),
+                linear-gradient(to right, transparent 11px, rgba(201, 72, 61, 0.3) 11px, rgba(201, 72, 61, 0.3) 12px, transparent 12px);
+            padding: 16px 20px 16px 32px;
+            border: 1px solid rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            font-family: var(--font-hand);
+            font-size: 18px;
+            line-height: 28px;
+            color: var(--paper-ink);
+        }
+
+        .pencil-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: var(--paper-accent);
+            opacity: 0.6;
+        }
+
+        /* 하단 영역 */
+        .card-footer {
+            padding: 32px 64px 48px;
+            border-top: 1px solid rgba(139, 111, 71, 0.1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .final-warning {
+            background-color: rgba(201, 72, 61, 0.08);
+            border-left: 3px solid var(--accent-danger);
+            padding: 12px 16px;
+            margin-bottom: 24px;
+        }
+
+        .warning-text {
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--paper-ink);
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-back {
+            font-family: var(--font-main);
+            font-size: 14px;
+            color: var(--paper-ink-faded);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-back:hover { color: var(--paper-ink); text-decoration: underline; }
+
+        .btn-submit {
+            background: linear-gradient(180deg, var(--accent-brass) 0%, var(--accent-leather) 100%);
+            color: #f5ebd8;
+            padding: 16px 48px;
+            border-radius: 4px;
+            border: 1px dashed rgba(245, 235, 216, 0.4);
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+
+        /* 서명 및 장식 */
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .signature-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--paper-ink-faded);
+        }
+
+        .signature-svg {
+            width: 120px;
+            height: 40px;
+            color: var(--paper-ink);
+            opacity: 0.7;
+        }
+
+        .completion-memo {
+            font-family: var(--font-hand);
+            font-size: 13px;
+            color: var(--paper-accent);
+            transform: rotate(-2deg);
+        }
+
+        /* 페이지 접힘 */
+        .page-fold {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            z-index: 20;
+        }
+        .page-fold::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 24px 24px 0;
+            border-style: solid;
+            border-color: transparent transparent var(--paper-shadow) transparent;
+        }
+
+        /* SVG Icon Class */
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="report-paper">
+        <div class="paper-stains"></div>
+        <div class="page-fold"></div>
+
+        <!-- Header -->
+        <header class="card-header">
+            <div class="header-left">
+                <svg class="company-mark" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <div class="company-info">
+                    <div class="brand">NOVATECH</div>
+                    <div class="dept">Internal Audit Division</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="report-label">Report No.</div>
+                <div class="report-number">2026-K-0413-R</div>
+                <div class="submit-date">2026.05.13 15:42</div>
+            </div>
+        </header>
+
+        <!-- DRAFT Stamp -->
+        <div class="draft-stamp">
+            <span>DRAFT · 미제출</span>
+        </div>
+
+        <!-- Body -->
+        <main class="card-body">
+            <div class="title-section">
+                <h1>수사 결과 보고서</h1>
+                <div class="subtitle">Final Investigation Report</div>
+                <div class="case-meta">사건: 한지훈 상무 부당해고 의혹 (No. 2026-K-0413)</div>
+            </div>
+
+            <!-- Section 1: Culprit -->
+            <section class="culprit-section">
+                <span class="section-label">1. 가해자 특정</span>
+                <span class="section-guide">본 사건의 직접 가해자로 판단되는 인물을 선택하시오.</span>
+                
+                <div class="poi-selector">
+                    <!-- POI 1: Selected -->
+                    <label class="poi-radio-card selected" style="transform: rotate(-0.5deg)">
+                        <input type="radio" name="culprit" value="jung-minho" style="display: none;">
+                        <div class="brass-pin-mini"></div>
+                        <div class="radio-ui"></div>
+                        <img src="../assets/characters/jung-minho.png" alt="정민호" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">정민호</div>
+                        <div class="poi-job">전략기획팀장</div>
+                    </label>
+                    <!-- POI 2 -->
+                    <label class="poi-radio-card" style="transform: rotate(0.8deg)">
+                        <input type="radio" name="culprit" value="han-jihun" style="display: none;">
+                        <div class="radio-ui"></div>
+                        <img src="../assets/characters/han-jihun.png" alt="한지훈" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">한지훈</div>
+                        <div class="poi-job">전 상무</div>
+                    </label>
+                    <!-- POI 3 -->
+                    <label class="poi-radio-card" style="transform: rotate(-0.3deg)">
+                        <input type="radio" name="culprit" value="yoon-seokyung" style="display: none;">
+                        <div class="radio-ui"></div>
+                        <img src="../assets/characters/yoon-seokyung.png" alt="윤서경" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">윤서경</div>
+                        <div class="poi-job">사업본부장</div>
+                    </label>
+                    <!-- POI 4 -->
+                    <label class="poi-radio-card" style="transform: rotate(0.6deg)">
+                        <input type="radio" name="culprit" value="kang-hyerin" style="display: none;">
+                        <div class="radio-ui"></div>
+                        <img src="../assets/characters/kang-hyerin.png" alt="강혜린" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">강혜린</div>
+                        <div class="poi-job">인사팀 차장</div>
+                    </label>
+                    <!-- POI 5 -->
+                    <label class="poi-radio-card" style="transform: rotate(-0.9deg)">
+                        <input type="radio" name="culprit" value="oh-sera" style="display: none;">
+                        <div class="radio-ui"></div>
+                        <img src="../assets/characters/oh-sera.png" alt="오세라" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="poi-name">오세라</div>
+                        <div class="poi-job">티타니아 부사장</div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Section 2: Evidence -->
+            <section class="evidence-section">
+                <span class="section-label">2. 결정적 증거</span>
+                <span class="section-guide">지목한 가해자의 범죄 사실을 입증할 핵심 단서를 최대 5개까지 선택하시오. (선택: 3 / 5)</span>
+                
+                <div class="evidence-grid">
+                    <!-- Item 1: Checked -->
+                    <div class="evidence-checkbox-card checked key">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">KEY-1b</span>
+                                <span class="evidence-cat">핵심 단서</span>
+                            </div>
+                            <div class="evidence-text">정민호 21~23시 행적 진술 회피</div>
+                        </div>
+                    </div>
+                    <!-- Item 2: Checked -->
+                    <div class="evidence-checkbox-card checked key">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">KEY-2</span>
+                                <span class="evidence-cat">핵심 단서</span>
+                            </div>
+                            <div class="evidence-text">위조 영수증 4장 본인 언급</div>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="evidence-checkbox-card key">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">KEY-3</span>
+                                <span class="evidence-cat">핵심 단서</span>
+                            </div>
+                            <div class="evidence-text">5개월 전 비공식 인사 문의</div>
+                        </div>
+                    </div>
+                    <!-- Item 4: Checked -->
+                    <div class="evidence-checkbox-card checked lie">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">L-01</span>
+                                <span class="evidence-cat">의도적 거짓말</span>
+                            </div>
+                            <div class="evidence-text">식사 종료 시각 진술 모순</div>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="evidence-checkbox-card lie">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">L-04</span>
+                                <span class="evidence-cat">의도적 거짓말</span>
+                            </div>
+                            <div class="evidence-text">영수증 매수 발설</div>
+                        </div>
+                    </div>
+                    <!-- Item 6 -->
+                    <div class="evidence-checkbox-card">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">F-12</span>
+                                <span class="evidence-cat">일반 사실</span>
+                            </div>
+                            <div class="evidence-text">9시 식사 종료 진술</div>
+                        </div>
+                    </div>
+                    <!-- Item 7 -->
+                    <div class="evidence-checkbox-card">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">F-05</span>
+                                <span class="evidence-cat">일반 사실</span>
+                            </div>
+                            <div class="evidence-text">한지훈 측 식사 진술 일치</div>
+                        </div>
+                    </div>
+                    <!-- Item 8 -->
+                    <div class="evidence-checkbox-card">
+                        <div class="checkbox-ui"></div>
+                        <div class="evidence-info">
+                            <div class="evidence-meta">
+                                <span class="evidence-code">F-23</span>
+                                <span class="evidence-cat">일반 사실</span>
+                            </div>
+                            <div class="evidence-text">정민호-오세라 호텔 회동</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Reasoning -->
+            <section class="reasoning-section">
+                <span class="section-label">3. 추리 진술</span>
+                <span class="section-guide">선택한 가해자가 어떻게 사건을 일으켰는지, 위 증거를 어떻게 연결하였는지 서술하시오. (200~500자, 현재: 287자)</span>
+                
+                <div class="reasoning-input-area">
+                    <svg class="pencil-icon icon" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    <div class="note-paper">
+                        정민호는 10월 15일 저녁 한지훈 상무와 식사 후 9시에 헤어졌다고 진술하였으나, 본인은 동시에 '11시까지 함께 있었다'고 모순된 진술을 하였다. <br><br>
+                        특히 21~23시 사이의 행적에 대한 진술을 회피하였고, 위조 영수증의 정확한 매수(4장)를 본인이 직접 언급한 점으로 미루어 위조 행위에 직접 가담했음이 강하게 의심된다. <br><br>
+                        따라서 본 감사관은 정민호를 한지훈 상무 무고의 직접 가해자로 특정한다.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="card-footer">
+            <div class="final-warning">
+                <div class="warning-text">※ 본 보고서는 제출 후 수정이 불가합니다. 신중히 확인하시기 바랍니다.</div>
+            </div>
+
+            <div class="footer-actions">
+                <a href="#" class="btn-back">조사로 돌아가기</a>
+                <button class="btn-submit">
+                    보고서 제출
+                    <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </button>
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-box">
+                    <span class="signature-label">감사관 서명</span>
+                    <svg class="signature-svg" viewBox="0 0 120 40">
+                        <path d="M10 30c10-2 20-15 40-5s30 15 60-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M30 20c15 10 40 0 60 5" fill="none" stroke="currentColor" stroke-width="1" stroke-opacity="0.5"/>
+                    </svg>
+                </div>
+                <div class="completion-memo">27분 23초 만에 작성 완료</div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
+
+

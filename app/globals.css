@@ -1,27 +1,380 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Serif+KR:wght@200..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* 배경 */
+  --bg-base: #0a0a0a;
+  --bg-elevated: #1a1a1a;
+  
+  /* 텍스트 */
+  --text-primary: #f0ebe0;
+  --text-secondary: #a8a29a;
+  --text-muted: #6b6660;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 캐릭터 컬러 */
+  --char-jung: #c97a3a;
+  --char-han: #5a8cc9;
+  --char-yoon: #9b6fb8;
+  --char-kang: #6ba373;
+  --char-oh: #c95a7a;
+  --char-echo: #d4a574;
+
+  /* 액센트 */
+  --accent-amber: #d4a574;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+
+  /* 폰트 패밀리 */
+  --font-main: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-serif: "Noto Serif KR", serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-hand: "Gaegu", cursive;
+  --paper-base: #ede4d5;
+  --paper-ink: #2a2520;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .suspect-select-card.locked {
+    opacity: 0.4;
+    filter: grayscale(80%);
+    cursor: not-allowed;
   }
+  .suspect-select-card.locked:hover {
+    transform: none;
+    border-color: var(--border-subtle);
+    box-shadow: none;
+  }
+  .lock-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .suspect-select-card.locked:hover .lock-overlay {
+    opacity: 1;
+  }
+  .lock-icon { font-size: 32px; }
+  .lock-message {
+    font-family: var(--font-main);
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .tutorial-hint {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 16px 0;
+  }
+
+  /* Animations */
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(0.98); }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes slide-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .inventory-theme {
+    background-color: #ede4d5 !important;
+    color: #2a2520;
+  }
+}
+
+.admin-page-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  font-family: var(--font-main);
+  transition: color 0.3s ease;
+  padding: 8px;
+}
+
+.admin-page-link:hover {
+  color: var(--accent-amber, #e8a55a);
+  text-decoration: underline;
+}
+
+.session-delete-btn {
+  background: transparent;
+  border: 1px solid rgba(220, 80, 80, 0.4);
+  color: rgba(220, 80, 80, 0.8);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.session-delete-btn:hover {
+  background: rgba(220, 80, 80, 0.15);
+  border-color: rgba(220, 80, 80, 0.7);
+  color: rgba(255, 120, 120, 1);
+}
+
+/* Character Turn Badges & Exhausted States */
+.suspect-select-card.exhausted {
+  opacity: 0.6;
+  filter: grayscale(0.6);
+}
+
+.turn-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--accent-amber);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  z-index: 20;
+  border: 1px solid rgba(212, 165, 116, 0.3);
+  letter-spacing: 0.05em;
+  backdrop-blur: 4px;
+}
+
+.turn-badge.completed {
+  background: rgba(40, 40, 40, 0.85);
+  color: #888;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-to-home-link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  font-family: var(--font-main);
+  transition: color 0.3s ease;
+  padding: 8px;
+}
+
+.back-to-home-link:hover {
+  color: var(--accent-amber, #e8a55a);
+}
+
+/* Restored Admin Dashboard Styles */
+.admin-container {
+  min-height: 100vh;
+  padding: 40px 60px;
+  background: var(--bg-base, #0a0a0a);
+  color: var(--text-primary, #f5f5f5);
+  font-family: var(--font-main);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 32px;
+}
+
+.admin-header h1 {
+  font-size: 24px;
+  letter-spacing: 0.05em;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 18px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.admin-section {
+  margin-bottom: 48px;
+}
+
+.admin-section h2 {
+  font-size: 18px;
+  color: var(--accent-amber, #e8a55a);
+  margin-bottom: 20px;
+  letter-spacing: 0.05em;
+}
+
+.create-form {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+}
+
+.admin-input {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: var(--accent-amber, #e8a55a);
+}
+
+.create-btn {
+  background: var(--accent-amber, #e8a55a);
+  color: #000;
+  border: none;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.create-btn:hover:not(:disabled) {
+  background: #f5b870;
+}
+
+.create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s;
+}
+
+.session-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.session-info {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.session-code {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--accent-amber, #e8a55a);
+  letter-spacing: 0.1em;
+}
+
+.session-title {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.session-status {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+}
+
+.session-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.manage-btn {
+  background: transparent;
+  border: 1px solid rgba(232, 165, 90, 0.4);
+  color: var(--accent-amber, #e8a55a);
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.manage-btn:hover {
+  background: rgba(232, 165, 90, 0.15);
+}
+
+.empty-message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
 }

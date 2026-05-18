@@ -1,0 +1,998 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project KRONOS - Evaluation Result v2.0</title>
+    <!-- Fonts -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nanum+Pen+Script&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* 디지털 다크 (배경) */
+            --bg-base: #0a0a0a;
+
+            /* 텍스트 */
+            --text-primary: #f0ebe0;
+            --text-secondary: #a8a29a;
+            --text-muted: #6b6660;
+
+            /* 종이 (기록물) */
+            --paper-base: #ede4d5;
+            --paper-shadow: #c9bfa8;
+            --paper-ink: #2a2520;
+            --paper-ink-faded: #5a544a;
+            --paper-accent: #8b6f47;
+
+            /* 액센트 */
+            --accent-amber: #d4a574;
+            --accent-amber-bright: #e8b888;
+            --accent-danger: #c9483d;
+            --accent-success: #3fb950;
+            --accent-leather: #4a3828;
+            --accent-brass: #b8945a;
+
+            /* 캐릭터 테마 */
+            --char-jung: #c97a3a;
+            --char-han: #5a8cc9;
+            --char-yoon: #9b6fb8;
+            --char-kang: #6ba373;
+            --char-oh: #c95a7a;
+
+            /* Typography Scaling */
+            --font-main: 'Pretendard', sans-serif;
+            --font-serif: 'Noto Serif KR', serif;
+            --font-hand: 'Gaegu', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 5vh 0;
+        }
+
+        /* 전역 그레인 오버레이 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.06;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 중앙 비네팅 */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9998;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* 메인 보고서 종이 */
+        .report-paper {
+            width: 90vw;
+            max-width: 960px;
+            min-height: 1200px;
+            background-color: var(--paper-base);
+            box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px var(--paper-shadow);
+            border-radius: 2px;
+            position: relative;
+            z-index: 10;
+            transform: rotate(-0.3deg);
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 5vh;
+        }
+
+        /* 종이 질감 */
+        .report-paper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.12;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+        }
+
+        /* 상단 헤더 */
+        .card-header {
+            height: 130px;
+            padding: 32px 48px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--paper-shadow);
+            position: relative;
+            z-index: 5;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .company-mark {
+            width: 24px;
+            height: 24px;
+            color: var(--paper-accent);
+        }
+
+        .company-info .brand {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--paper-ink);
+        }
+
+        .company-info .dept {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 2px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .eval-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+        }
+
+        .eval-number {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin: 2px 0;
+        }
+
+        .reply-date {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+        }
+
+        /* APPROVED 도장 */
+        .approved-stamp {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 180px;
+            height: 64px;
+            border: 4px double var(--accent-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(8deg);
+            mix-blend-mode: multiply;
+            opacity: 0.65;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .approved-stamp span {
+            color: var(--accent-success);
+            font-family: var(--font-main);
+            font-weight: 900;
+            font-size: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        /* 본문 영역 */
+        .card-body {
+            padding: 32px 56px;
+            flex: 1;
+            position: relative;
+            z-index: 5;
+        }
+
+        .title-section {
+            margin-bottom: 32px;
+        }
+
+        .title-section h1 {
+            font-family: var(--font-serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--paper-ink);
+        }
+
+        .title-section .subtitle {
+            font-family: var(--font-main);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-top: 4px;
+        }
+
+        .title-section .case-meta {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            color: var(--paper-ink-faded);
+            margin-top: 12px;
+        }
+
+        /* 종합 등급 영역 */
+        .grade-highlight {
+            background-color: rgba(139, 111, 71, 0.05);
+            border: 1px solid rgba(139, 111, 71, 0.1);
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .grade-badge {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-amber-bright) 0%, var(--accent-amber) 60%, var(--accent-leather) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.4);
+            transform: rotate(-5deg);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .grade-badge::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border: 1px solid var(--accent-amber);
+            border-radius: 50%;
+        }
+
+        .grade-badge .grade-letter {
+            font-family: var(--font-serif);
+            font-size: 120px;
+            font-weight: 700;
+            color: #f5ebd8;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .grade-badge .grade-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #f5ebd8;
+            margin-top: -10px;
+        }
+
+        .brass-pin-mini {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--accent-brass), var(--accent-leather));
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .summary-comment {
+            flex: 1;
+        }
+
+        .comment-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .comment-text {
+            font-family: var(--font-serif);
+            font-size: 17px;
+            line-height: 1.6;
+            color: var(--paper-ink);
+        }
+
+        .highlight {
+            background: rgba(212, 165, 116, 0.4);
+            padding: 0 2px;
+        }
+
+        .completion-time {
+            font-family: var(--font-hand);
+            font-size: 14px;
+            color: var(--paper-accent);
+            text-align: right;
+            margin-top: 12px;
+            transform: rotate(-2deg);
+        }
+
+        /* 섹션 공통 */
+        .section-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--paper-ink-faded);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .section-guide {
+            font-family: var(--font-main);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* 조사 진도율 섹션 */
+        .coverage-section {
+            margin-bottom: 48px;
+        }
+
+        .coverage-stats {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .donut-chart-box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+        }
+
+        .donut-svg { transform: rotate(-90deg); }
+        .donut-bg { fill: none; stroke: var(--paper-shadow); stroke-width: 24; }
+        .donut-fill { 
+            fill: none; 
+            stroke: var(--accent-amber); 
+            stroke-width: 24; 
+            stroke-dasharray: 502.65; 
+            stroke-dashoffset: 135.7; /* 73% */
+            stroke-linecap: round;
+        }
+
+        .donut-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .donut-percent {
+            font-family: var(--font-mono);
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--paper-ink);
+            line-height: 1;
+        }
+
+        .donut-items {
+            font-family: var(--font-main);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+            margin-top: 4px;
+        }
+
+        .donut-hand-label {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            font-family: var(--font-hand);
+            font-size: 16px;
+            color: var(--paper-accent);
+            transform: rotate(-3deg);
+        }
+
+        .bar-charts {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-meta {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-main);
+            font-size: 13px;
+            color: var(--paper-ink);
+        }
+
+        .bar-ratio { font-family: var(--font-mono); color: var(--paper-ink-faded); font-size: 12px; }
+
+        .bar-track {
+            height: 12px;
+            background-color: rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .star-icon { width: 12px; height: 12px; color: var(--accent-amber); vertical-align: middle; }
+
+        /* 캐릭터별 조사 충실도 */
+        .fidelity-section {
+            margin-bottom: 48px;
+        }
+
+        .fidelity-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+
+        .fidelity-card {
+            height: 140px;
+            background-color: rgba(255, 252, 245, 0.6);
+            border: 1px solid rgba(139, 111, 71, 0.2);
+            border-radius: 2px;
+            padding: 14px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .fidelity-card .poi-thumb {
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .fidelity-card .name {
+            font-family: var(--font-serif);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--paper-ink);
+            margin-bottom: 4px;
+        }
+
+        .fidelity-card .rate {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .fidelity-card .fraction {
+            font-family: var(--font-main);
+            font-size: 10px;
+            color: var(--paper-ink-faded);
+            margin-bottom: 8px;
+        }
+
+        .mini-bar-track {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(139, 111, 71, 0.1);
+            border-radius: 2px;
+        }
+        .mini-bar-fill { height: 100%; border-radius: 2px; }
+
+        /* 추리 정확도 평가 */
+        .accuracy-section {
+            margin-bottom: 48px;
+        }
+
+        .accuracy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accuracy-item {
+            padding: 14px 18px;
+            background-color: rgba(255, 252, 245, 0.5);
+            border: 1px solid rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left-width: 3px;
+            border-left-style: solid;
+        }
+
+        .accuracy-info .label {
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--paper-ink);
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .accuracy-info .comment {
+            font-family: var(--font-main);
+            font-size: 12px;
+            color: var(--paper-ink-faded);
+        }
+
+        .accuracy-result {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .result-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .result-points {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--paper-ink);
+        }
+
+        /* 강사 피드백 섹션 */
+        .feedback-section {
+            margin-bottom: 48px;
+        }
+
+        .feedback-box {
+            min-height: 280px;
+            background: 
+                repeating-linear-gradient(transparent 0px, transparent 28px, rgba(139, 111, 71, 0.2) 28px, rgba(139, 111, 71, 0.2) 29px),
+                linear-gradient(to right, transparent 11px, rgba(201, 72, 61, 0.3) 11px, rgba(201, 72, 61, 0.3) 12px, transparent 12px);
+            padding: 20px 24px 20px 36px;
+            border: 1px solid rgba(139, 111, 71, 0.15);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .feedback-text {
+            font-family: var(--font-hand);
+            font-size: 18px;
+            line-height: 29px;
+            color: var(--paper-ink);
+            white-space: pre-wrap;
+        }
+
+        .pencil-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: var(--paper-accent);
+            opacity: 0.6;
+        }
+
+        /* 하단 영역 */
+        .card-footer {
+            padding: 32px 56px 48px;
+            border-top: 1px solid rgba(139, 111, 71, 0.1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .truth-reveal-box {
+            background-color: rgba(212, 165, 116, 0.10);
+            border-left: 3px solid var(--accent-amber);
+            padding: 14px 18px;
+            margin-bottom: 24px;
+        }
+
+        .truth-label {
+            font-family: var(--font-main);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            color: var(--accent-amber);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .truth-text {
+            font-family: var(--font-serif);
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--paper-ink);
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .btn-text {
+            font-family: var(--font-main);
+            font-size: 14px;
+            color: var(--paper-ink-faded);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-text:hover { color: var(--paper-ink); text-decoration: underline; }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--paper-accent);
+            color: var(--paper-ink);
+            padding: 14px 32px;
+            border-radius: 4px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-leather {
+            background: linear-gradient(180deg, var(--accent-brass) 0%, var(--accent-leather) 100%);
+            color: #f5ebd8;
+            padding: 14px 36px;
+            border-radius: 4px;
+            border: 1px dashed rgba(245, 235, 216, 0.4);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 서명란 */
+        .signature-area {
+            margin-top: 40px;
+        }
+        .sig-label { font-family: var(--font-main); font-size: 10px; text-transform: uppercase; color: var(--paper-ink-faded); margin-bottom: 2px; display: block; }
+        .sig-signer { font-family: var(--font-serif); font-size: 14px; color: var(--paper-ink); margin-bottom: 4px; display: block; }
+        .sig-svg { width: 120px; height: 32px; color: var(--paper-ink); opacity: 0.7; }
+
+        /* 페이지 접힘 */
+        .page-fold {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 24px;
+            height: 24px;
+            z-index: 20;
+        }
+        .page-fold::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-width: 0 24px 24px 0;
+            border-style: solid;
+            border-color: transparent transparent var(--paper-shadow) transparent;
+        }
+
+        /* Icons */
+        .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+
+    <div class="report-paper">
+        <div class="page-fold"></div>
+
+        <!-- Header -->
+        <header class="card-header">
+            <div class="header-left">
+                <svg class="company-mark" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <div class="company-info">
+                    <div class="brand">NOVATECH</div>
+                    <div class="dept">Internal Audit Division</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="eval-label">Evaluation No.</div>
+                <div class="eval-number">2026-K-0413-E</div>
+                <div class="reply-date">2026.05.13 15:48</div>
+            </div>
+        </header>
+
+        <!-- APPROVED Stamp -->
+        <div class="approved-stamp">
+            <span>APPROVED · 검토 완료</span>
+        </div>
+
+        <!-- Body -->
+        <main class="card-body">
+            <div class="title-section">
+                <h1>수사 평가 결과</h1>
+                <div class="subtitle">Investigation Evaluation Result</div>
+                <div class="case-meta">사건: 한지훈 상무 부당해고 의혹 (No. 2026-K-0413)</div>
+                <div style="font-family: var(--font-main); font-size: 13px; color: var(--paper-ink-faded); margin-top: 4px;">감사관: [감사관]</div>
+            </div>
+
+            <!-- Grade Section -->
+            <div class="grade-highlight">
+                <div class="brass-pin-mini"></div>
+                <div class="grade-badge">
+                    <span class="grade-letter">A</span>
+                    <span class="grade-label">Grade</span>
+                </div>
+                <div class="summary-comment">
+                    <span class="comment-label">총평</span>
+                    <p class="comment-text">"핵심 단서를 다수 확보하고 <span class="highlight">가해자를 정확히 특정</span>하였으나, <span class="highlight">배후 인물</span>에 대한 추궁이 부족하였다. 추가 학습을 통해 조직적 부정행위의 구조를 파악하는 훈련이 필요하다."</p>
+                    <div class="completion-time">27분 23초 만에 완료</div>
+                </div>
+            </div>
+
+            <!-- Section 1: Coverage -->
+            <section class="coverage-section">
+                <span class="section-label">1. 조사 진도율</span>
+                <span class="section-guide">대화를 통해 확보한 단서의 비율</span>
+                <div class="coverage-stats">
+                    <div class="donut-chart-box">
+                        <svg class="donut-svg" width="200" height="200">
+                            <circle class="donut-bg" cx="100" cy="100" r="80"/>
+                            <circle class="donut-fill" cx="100" cy="100" r="80"/>
+                        </svg>
+                        <div class="donut-text">
+                            <span class="donut-percent">73 %</span>
+                            <span class="donut-items">30 / 41 항목</span>
+                        </div>
+                        <div class="donut-hand-label">양호</div>
+                    </div>
+                    <div class="bar-charts">
+                        <!-- Fact -->
+                        <div class="bar-item">
+                            <div class="bar-meta"><span>일반 사실</span><span class="bar-ratio">19 / 25</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 76%; background-color: var(--paper-accent)"></div></div>
+                        </div>
+                        <!-- Lie -->
+                        <div class="bar-item">
+                            <div class="bar-meta"><span>거짓말 간파</span><span class="bar-ratio">4 / 6</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 67%; background-color: var(--accent-danger)"></div></div>
+                        </div>
+                        <!-- Key -->
+                        <div class="bar-item">
+                            <div class="bar-meta"><span>핵심 단서 <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="bar-ratio">4 / 6</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 67%; background-color: var(--accent-amber)"></div></div>
+                        </div>
+                        <!-- RH -->
+                        <div class="bar-item">
+                            <div class="bar-meta"><span>함정 해소</span><span class="bar-ratio">3 / 4</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="width: 75%; background-color: var(--text-secondary)"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Fidelity -->
+            <section class="fidelity-section">
+                <span class="section-label">2. 캐릭터별 조사 충실도</span>
+                <div class="fidelity-grid">
+                    <div class="fidelity-card" style="transform: rotate(0.5deg)">
+                        <div class="brass-pin-mini" style="width:10px; height:10px;"></div>
+                        <img src="../assets/characters/jung-minho.png" alt="정민호" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="name">정민호</div>
+                        <div class="rate" style="color: var(--accent-success)">89%</div>
+                        <div class="fraction">8 / 9</div>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 89%; background-color: var(--accent-success)"></div></div>
+                    </div>
+                    <div class="fidelity-card" style="transform: rotate(-0.8deg)">
+                        <div class="brass-pin-mini" style="width:10px; height:10px;"></div>
+                        <img src="../assets/characters/han-jihun.png" alt="한지훈" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="name">한지훈</div>
+                        <div class="rate" style="color: var(--accent-success)">100%</div>
+                        <div class="fraction">4 / 4</div>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 100%; background-color: var(--accent-success)"></div></div>
+                    </div>
+                    <div class="fidelity-card" style="transform: rotate(0.3deg)">
+                        <div class="brass-pin-mini" style="width:10px; height:10px;"></div>
+                        <img src="../assets/characters/yoon-seokyung.png" alt="윤서경" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="name">윤서경</div>
+                        <div class="rate" style="color: var(--accent-success)">80%</div>
+                        <div class="fraction">4 / 5</div>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 80%; background-color: var(--accent-success)"></div></div>
+                    </div>
+                    <div class="fidelity-card" style="transform: rotate(-0.4deg)">
+                        <div class="brass-pin-mini" style="width:10px; height:10px;"></div>
+                        <img src="../assets/characters/kang-hyerin.png" alt="강혜린" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="name">강혜린</div>
+                        <div class="rate" style="color: var(--accent-amber)">75%</div>
+                        <div class="fraction">3 / 4</div>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 75%; background-color: var(--accent-amber)"></div></div>
+                    </div>
+                    <div class="fidelity-card" style="transform: rotate(1.1deg)">
+                        <div class="brass-pin-mini" style="width:10px; height:10px;"></div>
+                        <img src="../assets/characters/oh-sera.png" alt="오세라" class="poi-thumb" onerror="this.style.opacity=0.2; this.alt='이미지 누락'">
+                        <div class="name">오세라</div>
+                        <div class="rate" style="color: var(--accent-amber)">67%</div>
+                        <div class="fraction">2 / 3</div>
+                        <div class="mini-bar-track"><div class="mini-bar-fill" style="width: 67%; background-color: var(--accent-amber)"></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Accuracy -->
+            <section class="accuracy-section">
+                <span class="section-label">3. 추리 정확도 평가</span>
+                <div class="accuracy-list">
+                    <div class="accuracy-item" style="border-left-color: var(--accent-success)">
+                        <div class="accuracy-info">
+                            <span class="label">가해자 지목</span>
+                            <span class="comment">정민호 - 정답</span>
+                        </div>
+                        <div class="accuracy-result">
+                            <div class="result-badge" style="color: var(--accent-success)">
+                                <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                                정답
+                            </div>
+                            <div class="result-points">+30%</div>
+                        </div>
+                    </div>
+                    <div class="accuracy-item" style="border-left-color: var(--accent-amber)">
+                        <div class="accuracy-info">
+                            <span class="label">결정적 증거 적합</span>
+                            <span class="comment">KEY-1b, KEY-2 포함 / KEY-3 누락</span>
+                        </div>
+                        <div class="accuracy-result">
+                            <div class="result-badge" style="color: var(--accent-amber)">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                부분
+                            </div>
+                            <div class="result-points">+18 / 25%</div>
+                        </div>
+                    </div>
+                    <div class="accuracy-item" style="border-left-color: var(--accent-amber)">
+                        <div class="accuracy-info">
+                            <span class="label">추리 서술 품질</span>
+                            <span class="comment">논리 일관성 우수, 핵심 활용 양호, 배후 인지 미흡</span>
+                        </div>
+                        <div class="accuracy-result">
+                            <div class="result-badge" style="color: var(--accent-amber)">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                중상
+                            </div>
+                            <div class="result-points">+16 / 25%</div>
+                        </div>
+                    </div>
+                    <div class="accuracy-item" style="border-left-color: var(--accent-amber)">
+                        <div class="accuracy-info">
+                            <span class="label">종합 판정</span>
+                            <span class="comment">64 + 73% 진도율 가중 = A 등급</span>
+                        </div>
+                        <div class="accuracy-result">
+                            <div class="result-badge" style="color: var(--accent-amber)">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                A
+                            </div>
+                            <div class="result-points" style="color: var(--accent-amber)">최종 A</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Feedback -->
+            <section class="feedback-section">
+                <span class="section-label">4. 강사 피드백</span>
+                <span style="font-family: var(--font-main); font-size: 10px; text-transform: uppercase; color: var(--paper-ink-faded); margin-bottom: 8px; display: block;">From the Audit Director</span>
+                <div class="feedback-box">
+                    <svg class="pencil-icon icon" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+                    <div class="feedback-text">
+◆ 잘한 점
+   - 식사 시간 공백을 정확히 포착하여 거짓말을 적발한 점 우수
+   - 위조 영수증 매수 단서(KEY-2)를 끌어낸 질문 패턴 양호
+
+◆ 아쉬운 점
+   - 강혜린에게 정민호의 과거 행동을 충분히 추궁하지 않음
+   - 배후 인물(오세라)의 역할을 인지하지 못함
+
+◆ 놓친 핵심 단서
+   - KEY-3: 5개월 전 정민호의 비공식 인사 문의
+   - L-06: 오세라의 신제품 정보 발설
+
+◆ 추천 학습
+   조직적 부정행위는 단일 가해자 외에 배후 구조를 살피는 것이 중요. 
+   다음 사건에서는 인물 간 이해관계(특히 외부 경쟁사 연결)를 우선 점검하기 바람.
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="card-footer">
+            <div class="truth-reveal-box">
+                <span class="truth-label">사후 정보 · 사건 전모</span>
+                <div class="truth-text">
+                    정민호와 오세라는 5개월 전부터 비밀 회동을 이어왔으며, 오세라는 <span class="highlight">헬리오스 프로젝트</span> 정보를 대가로 한지훈 상무의 배제를 지시한 것으로 확인되었다. 정민호는 직접 가해자이나, 본 사건의 <span class="highlight">실질적 배후는 오세라</span>이다.
+                </div>
+            </div>
+
+            <div class="footer-actions">
+                <div class="action-links">
+                    <a href="#" class="btn-text">대화 복기</a>
+                    <a href="#" class="btn-text">정답 해설 보기</a>
+                    <a href="#" class="btn-text">디브리핑 작성</a>
+                </div>
+                <div class="btn-group">
+                    <button class="btn-secondary">재도전</button>
+                    <button class="btn-leather">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        보고서 출력
+                    </button>
+                </div>
+            </div>
+
+            <div class="signature-area">
+                <span class="sig-label">검토 책임자</span>
+                <span class="sig-signer">이지원 / 윤리감사실장</span>
+                <svg class="sig-svg" viewBox="0 0 120 40">
+                    <path d="M10 30c10-2 20-15 40-5s30 15 60-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M30 20c15 10 40 0 60 5" fill="none" stroke="currentColor" stroke-width="1" stroke-opacity="0.5"/>
+                </svg>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
+
+
