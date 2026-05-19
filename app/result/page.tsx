@@ -8,6 +8,8 @@ import { getSubmission, getSession } from '@/lib/firestore-session';
 import { CHARACTERS, CharacterId } from '@/lib/character-assets';
 import type { Submission } from '@/types/game';
 import { ensureAuth } from '@/lib/firebase';
+import ScenarioReveal from '@/components/ScenarioReveal';
+import { PreloadScenarioImages } from '@/components/ImagePreloader';
 
 export default function ResultPage() {
   const router = useRouter();
@@ -16,10 +18,20 @@ export default function ResultPage() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [scenarioFinished, setScenarioFinished] = useState(false);
+  const [hasSeenScenario, setHasSeenScenario] = useState(false);
 
   useEffect(() => {
     loadCatalog();
   }, [loadCatalog]);
+
+  // 시나리오 시청 여부 확인
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const seen = localStorage.getItem(`kronos-scenario-seen-${sessionCode}`);
+      if (seen === 'true') setHasSeenScenario(true);
+    }
+  }, [sessionCode]);
 
   useEffect(() => {
     async function loadData() {
@@ -51,6 +63,13 @@ export default function ResultPage() {
     loadData();
   }, [sessionCode, router]);
 
+  const handleScenarioComplete = () => {
+    if (sessionCode) {
+      localStorage.setItem(`kronos-scenario-seen-${sessionCode}`, 'true');
+    }
+    setScenarioFinished(true);
+  };
+
   const handleRestart = () => {
     if(confirm('모든 기록을 초기화하고 다시 시작하시겠습니까?')) {
       clear();
@@ -62,6 +81,16 @@ export default function ResultPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#ede4d5] text-[#2a2520] font-[var(--font-serif)]">수사 결과 처리 중...</div>;
   if (error) return <div className="min-h-screen flex items-center justify-center bg-black text-red-500 p-8 text-center">{error}</div>;
   if (!submission) return null;
+
+  // 시나리오 재생 조건: 아직 안 봤고 로딩 끝남
+  if (!hasSeenScenario && !scenarioFinished) {
+    return (
+      <>
+        <PreloadScenarioImages />
+        <ScenarioReveal onComplete={handleScenarioComplete} />
+      </>
+    );
+  }
 
   const { evaluation, answer, playDuration } = submission;
   const gradeColors = {

@@ -1,4 +1,4 @@
-export type Emotion = 'normal' | 'thinking' | 'surprise' | 'worry';
+export type Emotion = 'normal' | 'thinking' | 'surprise' | 'worry' | 'smile';
 
 export interface Message {
   id: string;

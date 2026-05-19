@@ -8,6 +8,7 @@ import { CHARACTERS, getCharacterImage, getCharacterOrder, CharacterId } from "@
 import { useInterviewStore, MAX_TURNS_PER_CHARACTER } from "@/store/interview-store";
 import { usePlayerStore } from "@/store/player-store";
 import { useEchoStore } from "@/store/echo-store";
+import { PreloadHomeImages } from "@/components/ImagePreloader";
 
 export default function Home() {
   const router = useRouter();
@@ -44,6 +45,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-[var(--font-main)] relative overflow-hidden flex flex-col items-center p-8 lg:p-16">
+      <PreloadHomeImages />
       {/* 그레인 오버레이 */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
       
@@ -86,7 +88,7 @@ export default function Home() {
           {order.map((id) => {
             const character = CHARACTERS[id];
             const unlocked = isUnlocked(id);
-            const turns = characterTurns[id] || 0;
+            const turns = characterTurns[id as CharacterId] || 0;
             const exhausted = isCharacterExhausted(id);
 
             const cardContent = (

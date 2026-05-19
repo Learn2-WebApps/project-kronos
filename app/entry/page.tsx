@@ -60,6 +60,11 @@ export default function EntryPage() {
         useInterviewStore.getState().resetGame();
         useEchoStore.getState().resetEcho?.();
         useClueStore.getState().reset();
+        
+        // 시나리오 시청 플래그 초기화
+        if (code) {
+          localStorage.removeItem(`kronos-scenario-seen-${code}`);
+        }
       }
 
       if (existingSub) {

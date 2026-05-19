@@ -8,6 +8,7 @@ import { useInterviewStore } from '@/store/interview-store';
 import { CHARACTERS, getCharacterImage, getCharacterOrder, CharacterId } from '@/lib/character-assets';
 import { ensureAuth } from '@/lib/firebase';
 import { submitAnswer } from '@/lib/firestore-session';
+import { PreloadScenarioImages } from '@/components/ImagePreloader';
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -93,6 +94,7 @@ export default function SubmitPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] font-[var(--font-main)] p-8 lg:p-16 relative overflow-x-hidden">
+      <PreloadScenarioImages />
       <div className="fixed inset-0 pointer-events-none opacity-[0.04] mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
       
       <header className="relative z-10 max-w-4xl mx-auto mb-12 border-b border-[var(--border-subtle)] pb-6 flex justify-between items-end">

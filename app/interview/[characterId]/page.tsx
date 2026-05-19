@@ -10,6 +10,7 @@ import { usePlayerStore } from '@/store/player-store';
 import { useClueStore } from '@/store/clue-store';
 import { syncClueToFirestore } from '@/lib/firestore-clue';
 import { getCluesByOwner } from '@/lib/clue-catalog';
+import { PreloadCharacterEmotions } from '@/components/ImagePreloader';
 
 export default function InterviewPage({ params }: { params: { characterId: string } }) {
   const router = useRouter();
@@ -34,6 +35,10 @@ export default function InterviewPage({ params }: { params: { characterId: strin
   const messages = allMessages[characterId] || [];
   const currentTurns = characterTurns[characterId] || 0;
   const isExhausted = isCharacterExhausted(characterId);
+
+  // 현재 감정 결정 (가장 최근 AI 메시지의 감정)
+  const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant');
+  const displayEmotion = lastAssistantMsg?.emotion || 'normal';
 
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -86,6 +91,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
 
   return (
     <div className="flex h-screen bg-[var(--bg-base)] text-[var(--text-primary)] overflow-hidden font-[var(--font-main)]">
+      <PreloadCharacterEmotions characterId={characterId} />
       {/* 상단 바 */}
       <header className="fixed top-0 left-0 right-0 h-[56px] border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/80 backdrop-blur-md z-40 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
@@ -125,11 +131,12 @@ export default function InterviewPage({ params }: { params: { characterId: strin
           
           <div className="relative w-full h-[90%] transition-opacity duration-300">
             <Image
-              src={getCharacterImage.expression(characterId, currentEmotion)}
+              key={`${characterId}-${displayEmotion}`}
+              src={getCharacterImage.expression(characterId, displayEmotion)}
               alt={charInfo.name}
               fill
               priority
-              className="object-contain object-bottom transition-opacity duration-300"
+              className="object-contain object-bottom transition-opacity duration-300 animate-in fade-in"
             />
           </div>
 

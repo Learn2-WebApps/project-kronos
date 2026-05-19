@@ -5,7 +5,25 @@ export type CharacterId =
   | "jung-minho"
   | "yoon-seokyung";
 
-export type Emotion = "normal" | "thinking" | "surprise" | "worry" | "smile" | "angry";
+// 대화 중 사용 가능한 표정 (LLM에 노출되는 것)
+export type Emotion = "normal" | "surprise" | "thinking" | "worry" | "smile";
+
+// 시나리오 등 특수 상황 전용
+export type SpecialEmotion = "angry";
+
+// 캐릭터별 대화 가능 표정
+export const CHARACTER_EMOTIONS: Record<CharacterId, Emotion[]> = {
+  'han-jihun': ['normal', 'surprise', 'thinking', 'worry', 'smile'],
+  'jung-minho': ['normal', 'surprise', 'thinking', 'worry'],
+  'oh-sera': ['normal', 'surprise', 'thinking', 'worry'],
+  'yoon-seokyung': ['normal', 'surprise', 'thinking', 'worry'],
+  'kang-hyerin': ['normal', 'surprise', 'thinking', 'worry'],
+};
+
+// 시나리오 전용 이미지 헬퍼
+export const SCENARIO_IMAGES = {
+  jungMinhoAngry: '/characters/jung-minho-angry.png',
+};
 
 export interface CharacterInfo {
   name: string;
@@ -36,7 +54,7 @@ export const getCharacterImage = {
   background: (id: CharacterId) => `/characters/${id}-background.png`,
 
   /** 표정별 상반신 (메인 인터뷰) */
-  expression: (id: CharacterId, emotion: Emotion = "normal") =>
+  expression: (id: CharacterId, emotion: Emotion | SpecialEmotion = "normal") =>
     `/characters/${id}-${emotion}.png`,
 
   /** ECHO 마스코트 */
