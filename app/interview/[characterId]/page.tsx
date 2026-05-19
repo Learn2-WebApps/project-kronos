@@ -27,6 +27,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
     startInterview,
     sendMessage,
     isCharacterExhausted,
+    getTurnsLeft,
   } = useInterviewStore();
   
   const { addClues, collected } = useClueStore();
@@ -34,6 +35,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
 
   const messages = allMessages[characterId] || [];
   const currentTurns = characterTurns[characterId] || 0;
+  const turnsLeft = getTurnsLeft(characterId);
   const isExhausted = isCharacterExhausted(characterId);
 
   // 현재 감정 결정 (가장 최근 AI 메시지의 감정)
@@ -110,10 +112,14 @@ export default function InterviewPage({ params }: { params: { characterId: strin
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-[var(--font-mono)]">Interview</span>
-            <span className={`font-bold font-[var(--font-mono)] ${isExhausted ? 'text-red-500' : 'text-[var(--accent-amber)]'}`}>
-              {currentTurns} / {MAX_TURNS_PER_CHARACTER}
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-sm border transition-colors ${
+            turnsLeft <= 1 ? 'border-red-500/50 bg-red-900/20 text-red-400' :
+            turnsLeft <= 3 ? 'border-yellow-500/50 bg-yellow-900/20 text-yellow-400' :
+            'border-zinc-700 bg-zinc-800 text-zinc-300'
+          }`}>
+            <span className="text-[10px] uppercase tracking-widest font-bold">💬 남은 질문</span>
+            <span className="font-bold font-[var(--font-mono)]">
+              {turnsLeft} / {MAX_TURNS_PER_CHARACTER}
             </span>
           </div>
         </div>
@@ -213,7 +219,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
                     handleSend();
                   }
                 }}
-                placeholder={isExhausted ? "대화 한도 도달 - 더 이상 질문할 수 없습니다" : `${charInfo.name}에게 질문을 입력하세요...`}
+                placeholder={isExhausted ? "이 인물과의 대화가 종료되었습니다" : `${charInfo.name}에게 질문을 입력하세요...`}
                 disabled={isLoading || isExhausted}
                 maxLength={200}
                 className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-sm p-4 pr-24 min-h-[80px] max-h-[200px] resize-none focus:outline-none focus:border-[var(--accent-amber)] transition-colors disabled:opacity-50"

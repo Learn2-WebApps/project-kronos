@@ -526,6 +526,56 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     owners: ['yoon-seokyung'],
     triggers: ['존중했다', '정정당당', '이기고 싶었다', '비겁하게'],
     level: 1
+  },
+  'F-28': {
+    id: 'F-28',
+    type: 'F',
+    title: '컨퍼런스 동행 사실',
+    name: '컨퍼런스 동행 사실',
+    content: '4월 업계 컨퍼런스에 한지훈 상무와 정민호 팀장이 함께 참석했습니다.',
+    owners: ['yoon-seokyung'],
+    triggers: ['4월', '컨퍼런스', '참석', '외부 행사'],
+    level: 1
+  },
+  'F-29': {
+    id: 'F-29',
+    type: 'F',
+    title: '정민호의 승진 누락',
+    name: '정민호의 승진 누락',
+    content: '정민호 팀장은 지난번 인사 평가에서 승진 누락된 이력이 확인되었습니다.',
+    owners: ['kang-hyerin'],
+    triggers: ['정민호', '승진', '인사 평가', '누락'],
+    level: 2
+  },
+  'F-30': {
+    id: 'F-30',
+    type: 'F',
+    title: '경쟁사 접촉 첩보',
+    name: '경쟁사 접촉 첩보',
+    content: '외부 경쟁사로부터 비공식 접촉을 받은 직원이 있다는 첩보가 인사팀에 입수된 바 있습니다.',
+    owners: ['kang-hyerin'],
+    triggers: ['외부 접촉', '경쟁사', '스카우트', '헤드헌팅'],
+    level: 2
+  },
+  'F-31': {
+    id: 'F-31',
+    type: 'F',
+    title: '오세라의 관심',
+    name: '오세라의 관심',
+    content: '오세라 부사장은 4월 컨퍼런스 이후 정민호 팀장의 업무 능력에 관심을 가지고 지켜보고 있었습니다.',
+    owners: ['oh-sera'],
+    triggers: ['정민호', '컨퍼런스', '인재', '관심'],
+    level: 2
+  },
+  'F-32': {
+    id: 'F-32',
+    type: 'F',
+    title: '정민호의 심경 변화',
+    name: '정민호의 심경 변화',
+    content: '최근 정민호 팀장은 평소의 활기찬 모습과는 달리 상당히 의기소침해 보였다고 합니다.',
+    owners: ['han-jihun'],
+    triggers: ['정민호', '팀 분위기', '최근 변화'],
+    level: 1
   }
 };
 
@@ -542,7 +592,10 @@ export function getClueById(id: string): ClueDefinition | undefined {
 }
 
 export function canDeriveKey4(collectedIds: string[]): boolean {
-  const required = ['F-26', 'F-27', 'L-06'];
-  const owned = required.filter(id => collectedIds.includes(id));
-  return owned.length >= 2;
+  const isF26 = collectedIds.includes('F-26');
+  const isF27 = collectedIds.includes('F-27');
+  const isGroup1 = collectedIds.includes('F-28') || collectedIds.includes('F-31');
+  const isGroup2 = collectedIds.includes('F-29') || collectedIds.includes('F-30');
+  
+  return isF26 && isF27 && isGroup1 && isGroup2;
 }

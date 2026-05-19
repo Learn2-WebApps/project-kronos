@@ -10,7 +10,7 @@ interface InventoryModalProps {
   onClose: () => void;
 }
 
-type TabId = 'all' | CharacterId | 'key';
+type TabId = 'all' | CharacterId;
 
 export default function InventoryModal({ onClose }: InventoryModalProps) {
   const { collected } = useClueStore();
@@ -38,10 +38,14 @@ export default function InventoryModal({ onClose }: InventoryModalProps) {
   
   // 현재 탭에 해당하는 단서들 필터링
   const getVisibleClues = () => {
-    const allClues = Object.values(CLUE_CATALOG);
-    if (activeTab === 'all') return allClues;
-    if (activeTab === 'key') return allClues.filter(c => c.type === 'KEY');
-    return allClues.filter(c => c.owners.includes(activeTab));
+    if (activeTab === 'all') {
+      // 전체 탭: 수집한 모든 단서를 수집 순서대로 나열
+      return collected
+        .map(c => getClueById(c.id))
+        .filter((c): c is any => !!c);
+    }
+    // 인물별 탭: 해당 인물이 보유한 모든 단서 (미수집 포함)
+    return Object.values(CLUE_CATALOG).filter(c => c.owners.includes(activeTab));
   };
 
   const visibleClues = getVisibleClues();
@@ -64,7 +68,7 @@ export default function InventoryModal({ onClose }: InventoryModalProps) {
               Investigation Notes
             </h2>
             <div className="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-400 font-mono">
-              CONFIDENTIAL // {collected.length} / 46
+              CONFIDENTIAL // {collected.length} / 51
             </div>
           </div>
           <button 
@@ -83,12 +87,6 @@ export default function InventoryModal({ onClose }: InventoryModalProps) {
               onClick={() => setActiveTab('all')} 
             />
             <div className="my-2 h-px bg-zinc-800" />
-            <TabButton 
-              id="key" label="결정적 단서" active={activeTab === 'key'} 
-              onClick={() => setActiveTab('key')} 
-              icon="💎"
-            />
-            <div className="my-2 h-px bg-zinc-800" />
             {(Object.entries(CHARACTERS) as [CharacterId, any][]).map(([id, info]) => (
               <TabButton 
                 key={id} id={id} label={info.name} active={activeTab === id} 
@@ -99,6 +97,12 @@ export default function InventoryModal({ onClose }: InventoryModalProps) {
 
           {/* 메인 리스트 영역 */}
           <main className="flex-1 overflow-y-auto p-8 bg-[url('/textures/paper-dark.png')] bg-repeat">
+            {activeTab === 'all' && visibleClues.length === 0 && (
+              <div className="h-full flex flex-col items-center justify-center text-zinc-600 opacity-50">
+                <p>수집된 단서가 없습니다.</p>
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {visibleClues.map((clue) => {
                 const isCollected = collectedIds.includes(clue.id);
@@ -135,19 +139,19 @@ export default function InventoryModal({ onClose }: InventoryModalProps) {
             </div>
 
             {/* 특수 섹션: KEY-4 분석 제안 */}
-            {activeTab === 'key' && !collectedIds.includes('KEY-4') && (
+            {!collectedIds.includes('KEY-4') && (
               <div className="mt-12 p-8 border-2 border-dashed border-zinc-800 rounded-lg flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-zinc-700">
                   <span className="text-2xl grayscale opacity-50">💎</span>
                 </div>
                 <h3 className="text-lg font-bold text-zinc-400 mb-2">내부 유출자 정보 분석 중...</h3>
                 <p className="text-sm text-zinc-500 max-w-md mb-6">
-                  티타니아 신제품 정보(F-26), 정민호의 권한(F-27), 오세라의 누설(L-06) 중 2개 이상의 단서를 확보하면 ECHO가 정보를 종합 분석할 수 있습니다.
+                  주요 단서(F-26, F-27 등)를 충분히 확보하면 ECHO가 정보를 종합 분석할 수 있습니다.
                 </p>
                 {canDeriveKey4(collectedIds) ? (
                   <button 
                     onClick={() => { onClose(); openEcho(); }}
-                    className="px-6 py-3 bg-amber-600 text-white font-bold rounded-sm hover:bg-amber-500 transition-colors shadow-xl animate-pulse"
+                    className="px-6 py-3 bg-amber-600 text-white font-bold rounded-sm hover:bg-amber-500 transition-colors shadow-xl"
                   >
                     ECHO에 분석 요청하기
                   </button>

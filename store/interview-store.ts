@@ -4,6 +4,7 @@ import type { CharacterId } from '@/lib/character-assets';
 import type { Message, Emotion, Clue } from '@/types/game';
 import { fetchClueCatalog } from '@/lib/clue-client';
 import type { ClueMetadata } from '@/lib/clue-catalog';
+import { useClueStore } from './clue-store';
 
 export const MAX_TURNS_PER_CHARACTER = 10;
 
@@ -108,6 +109,8 @@ export const useInterviewStore = create<InterviewState>()(
         }));
         
         try {
+          const collectedClueIds = useClueStore.getState().getCollectedIds();
+
           const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -115,6 +118,7 @@ export const useInterviewStore = create<InterviewState>()(
               characterId: cid,
               messages: prevMessages,
               userInput,
+              collectedClueIds,
             }),
           });
           

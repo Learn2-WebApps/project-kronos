@@ -19,6 +19,7 @@ export interface ChatRequest {
   characterId: string;
   messages: Message[];
   userInput: string;
+  collectedClueIds?: string[];
 }
 
 export interface ChatResponse {

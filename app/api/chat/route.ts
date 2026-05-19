@@ -19,13 +19,30 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-    
     const body: ChatRequest = await req.json();
-    const { characterId, messages, userInput } = body;
-    
+    const { characterId, messages, userInput, collectedClueIds } = body;
+
     let systemPrompt = loadCharacterPrompt(characterId);
-    
-    // 캐릭터 보유 단서 목록 주입
+
+    // 수집한 단서 요약 주입
+    const collectedSummary = (collectedClueIds || [])
+      .map(id => {
+        const clue = CLUE_CATALOG[id];
+        return clue ? `- ${id}: ${clue.content}` : null;
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    systemPrompt += `
+    \n[학습자가 현재까지 수집한 단서]
+    ${collectedSummary || '(아직 수집한 단서 없음)'}
+
+    [증거 인지 규칙]
+    - 학습자의 질문에 위 단서 내용이 직접 언급되거나 강하게 암시되면, 당신은 "그 정보를 이미 알고 있는 상대"로 인식하고 방어선을 한 단계 낮추세요.
+    - 예: 학습자가 "4월 컨퍼런스" 또는 "정민호 승진 누락"을 언급하면, 완전 부인 → 부분 인정으로 전환.
+    `;
+
+    // 캐릭터 보유 단서 목록 주입 (태깅용)
     const myClues = getCluesByOwner(characterId);
     const cluesList = myClues.map(c => `[${c.id}] ${c.title}: ${c.content}`).join('\n');
     
