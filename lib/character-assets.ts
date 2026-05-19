@@ -5,7 +5,7 @@ export type CharacterId =
   | "jung-minho"
   | "yoon-seokyung";
 
-export type Emotion = "normal" | "thinking" | "surprise" | "worry";
+export type Emotion = "normal" | "thinking" | "surprise" | "worry" | "smile" | "angry";
 
 export interface CharacterInfo {
   name: string;
