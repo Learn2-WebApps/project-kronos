@@ -2,6 +2,23 @@
 
 본 프로젝트의 모든 주요 변경사항을 이 파일에 기록합니다.
 
+## [v4.4.21] - 2026-05-19
+### Added (단서 수집 시스템 - Track 2)
+- 단서 카탈로그 코드화 (lib/clue-catalog.ts, 46개 단서)
+- Zustand 기반 clue-store (수집·읽음 처리·영속화)
+- Firestore 단서 동기화 (lib/firestore-clue.ts)
+- LLM 응답 단서 태그 파싱 + 키워드 백업 매칭 (lib/clue-parser.ts)
+- 신규 단서 토스트 알림 (ClueToast.tsx, 우상단 슬라이드 인)
+- 추리 노트 인벤토리 모달 (InventoryButton/InventoryModal, 캐릭터별 탭)
+- ECHO 단서 컨텍스트 주입 (수집된 단서를 systemPrompt에 동적 삽입)
+- KEY-4 도출 분기 (F-26+F-27+L-06 중 2개 이상 보유 시 ECHO 분석 가능)
+- 캐릭터·ECHO 응답에서 단서 자동 수집 및 출처 기록
+
+### Changed
+- app/layout.tsx에 InventoryButton, ClueToast 전역 마운트
+- 캐릭터/ECHO 시스템 프롬프트에 <clues> 태그 출력 지침 추가
+- 학습자 입력 200자 제한 유지, <clues> 태그는 학습자에게 비노출
+
 ## [v4.4.20] - 2026-05-19
 ### Changed (스토리 보강 - Track 1, 문서 갱신만)
 - 강혜린-윤서경 관계 재설계: 입사 동기 → 대학 동문 + 사내 친분, 맥거핀 강화 (F-21 수정)

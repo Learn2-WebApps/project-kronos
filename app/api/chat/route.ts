@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { loadCharacterPrompt } from '@/lib/prompt-loader';
 import { parseAIResponse } from '@/lib/response-parser';
-import { detectCluesByKeywords, getClueById } from '@/lib/clue-catalog';
+import { getCluesByOwner } from '@/lib/clue-catalog';
+import { extractClues } from '@/lib/clue-parser';
 import type { ChatRequest, ChatResponse, Message } from '@/types/game';
 
 const MODEL_ID = 'gemini-3-flash-preview';
@@ -20,8 +21,20 @@ export async function POST(req: NextRequest) {
     const body: ChatRequest = await req.json();
     const { characterId, messages, userInput } = body;
     
-    const systemPrompt = loadCharacterPrompt(characterId);
+    let systemPrompt = loadCharacterPrompt(characterId);
     
+    // 캐릭터 보유 단서 목록 주입
+    const myClues = getCluesByOwner(characterId);
+    const cluesList = myClues.map(c => `[${c.id}] ${c.title}: ${c.content}`).join('\n');
+    
+    systemPrompt += `
+\n응답이 다음 단서 중 하나 이상을 포함하는 경우, 응답 본문 마지막에 다음 형식으로 단서 ID를 명시하라:
+<clues>F-12,L-06</clues>
+학습자에게는 이 태그가 보이지 않는다. 단서 ID는 정확히 카탈로그의 ID를 사용하라.
+당신이 보유한 단서 목록:
+${cluesList}
+`;
+
     // 런타임 검증: 핵심 사실 주입 여부 확인
     if (!systemPrompt.includes('티타니아는 노바테크의 **경쟁사**')) {
       console.error('[CRITICAL] Canonical facts missing in system prompt!');
@@ -57,35 +70,27 @@ export async function POST(req: NextRequest) {
     const rawText = response.text ?? '';
     console.log('[chat] raw response:', rawText);
     
-    // 마크다운 제거
-    const cleanText = (text: string) => text
+    // 마크다운 제거 유틸
+    const cleanMarkdown = (text: string) => text
       .replace(/\*\*(.+?)\*\*/g, '$1')
       .replace(/\*(.+?)\*/g, '$1')
       .replace(/`(.+?)`/g, '$1')
       .replace(/^#+\s+/gm, '')
       .replace(/^[-*]\s+/gm, '');
       
-    const cleanedRawText = cleanText(rawText);
-    const parsed = parseAIResponse(cleanedRawText);
+    // 단서 추출 (태그 + 키워드 백업)
+    const { clean: textWithoutClues, ids } = extractClues(rawText, characterId);
+    const cleanedContent = cleanMarkdown(textWithoutClues);
+    const parsed = parseAIResponse(cleanedContent);
     
-    // 길이 제한 200자
+    // 최종 응답 텍스트 (길이 제한 200자)
     const finalContent = parsed.content.slice(0, 200);
-    
-    // 키워드 매칭 백업 (AI가 <clues> 태그 빠뜨려도 자동 감지)
-    const keywordClues = detectCluesByKeywords(finalContent);
-    const allClueIds = Array.from(new Set([...parsed.clueIds, ...keywordClues]));
-    
-    // 현재 캐릭터의 단서 또는 공통 단서만 필터링
-    const validClueIds = allClueIds.filter(id => {
-      const clue = getClueById(id);
-      return clue && (!clue.characterId || clue.characterId === characterId);
-    });
     
     const result: ChatResponse = {
       content: finalContent,
       emotion: parsed.emotion,
-      clueIds: validClueIds,
-      raw: cleanedRawText,
+      clueIds: ids,
+      raw: rawText,
     };
     
     return NextResponse.json(result);

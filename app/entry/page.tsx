@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePlayerStore } from '@/store/player-store';
 import { useInterviewStore } from '@/store/interview-store';
 import { useEchoStore } from '@/store/echo-store';
+import { useClueStore } from '@/store/clue-store';
 import { ensureAuth } from '@/lib/firebase';
 import { validateSession, getSession, getSubmission } from '@/lib/firestore-session';
 
@@ -58,16 +59,17 @@ export default function EntryPage() {
         // 새 학습자 → 모든 게임 상태 초기화
         useInterviewStore.getState().resetGame();
         useEchoStore.getState().resetEcho?.();
+        useClueStore.getState().reset();
       }
 
       if (existingSub) {
-        setPlayerInfo({ sessionCode: code, name, department });
+        setPlayerInfo({ sessionCode: code, name, department, learnerId: user.uid });
         usePlayerStore.getState().markSubmitted();
         router.push('/result');
         return;
       }
 
-      setPlayerInfo({ sessionCode: code, name, department });
+      setPlayerInfo({ sessionCode: code, name, department, learnerId: user.uid });
       
       if (session?.status === 'revealed') {
         router.push('/result');

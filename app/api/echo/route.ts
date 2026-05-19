@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { getClueById } from '@/lib/clue-catalog';
+import { getClueById, canDeriveKey4 } from '@/lib/clue-catalog';
+import { extractClues } from '@/lib/clue-parser';
 import { CANONICAL_FACTS } from '@/lib/prompts/canonical-facts';
 import type { Message } from '@/types/game';
 
@@ -68,14 +69,20 @@ export async function POST(req: NextRequest) {
       .map(id => {
         const meta = getClueById(id);
         if (!meta) return null;
-        return `- [${meta.id}] ${meta.name}: ${meta.content}`;
+        return `- [${meta.id}] ${meta.title}: ${meta.content}`;
       })
       .filter(Boolean)
       .join('\n');
     
-    const contextPrompt = collectedClueText
+    let contextPrompt = collectedClueText
       ? `## 학습자가 현재까지 수집한 단서 (${collectedClueIds.length}개)\n${collectedClueText}\n\n위 단서만을 기반으로 답변하세요. 아직 발견되지 않은 정보는 언급하지 마세요.`
       : '학습자는 아직 단서를 수집하지 않았습니다. 먼저 용의자들과 대화하도록 안내하세요.';
+
+    // KEY-4 도출 가능성 체크
+    if (canDeriveKey4(collectedClueIds) && !collectedClueIds.includes('KEY-4')) {
+      contextPrompt += `
+\n[특수 지시] 학습자가 신제품/티타니아/유출/정민호 권한 관련 분석을 요청하면, F-26·F-27·L-06을 종합해 '정민호가 오세라에게 신제품 정보를 유출한 내부자'라는 결론을 제시할 수 있다. 이 경우 응답에 <clues>KEY-4</clues>를 포함하라.`;
+    }
     
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
     
@@ -99,16 +106,18 @@ export async function POST(req: NextRequest) {
     
     const rawContent = response.text ?? '';
     
-    const cleanText = (text: string) => text
+    const cleanMarkdown = (text: string) => text
       .replace(/\*\*(.+?)\*\*/g, '$1')
       .replace(/\*(.+?)\*/g, '$1')
       .replace(/`(.+?)`/g, '$1')
       .replace(/^#+\s+/gm, '')
       .replace(/^[-*]\s+/gm, '');
       
-    const content = cleanText(rawContent).slice(0, 200);
+    // 단서 추출
+    const { clean: textWithoutClues, ids } = extractClues(rawContent, 'echo');
+    const content = cleanMarkdown(textWithoutClues).slice(0, 200);
 
-    return NextResponse.json({ content });
+    return NextResponse.json({ content, clueIds: ids });
   } catch (err: any) {
     console.error('[echo] error:', err);
     return NextResponse.json({ error: err.message ?? '오류 발생' }, { status: 500 });

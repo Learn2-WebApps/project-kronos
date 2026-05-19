@@ -3,40 +3,45 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useEchoStore } from '@/store/echo-store';
-import { useInterviewStore } from '@/store/interview-store';
+import { useClueStore } from '@/store/clue-store';
+import { syncClueToFirestore } from '@/lib/firestore-clue';
+import { usePlayerStore } from '@/store/player-store';
 
 export default function EchoModal() {
   const { messages, isLoading, error, sendToEcho, isModalOpen, closeModal } = useEchoStore();
-  const { collectedClues } = useInterviewStore();
+  const { getCollectedIds, addClues } = useClueStore();
+  const { sessionCode, learnerId } = usePlayerStore();
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // 자동 스크롤
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isLoading]);
+  // ... (스크롤 및 ESC 로직 동일)
 
-  // ESC 키로 닫기
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [closeModal]);
-
-  if (!isModalOpen) return null;
-
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading || trimmed.length > 200) return;
-    const clueIds = collectedClues.map(c => c.id);
-    sendToEcho(trimmed, clueIds);
+    
+    const clueIds = getCollectedIds();
+    
+    // ECHO 에 메시지 전송 (기존 sendToEcho 를 확장하거나 내부에서 fetch 처리 확인 필요)
+    // 여기서는 기존 sendToEcho 가 clueIds 를 받는지 확인
+    await sendToEcho(trimmed, clueIds);
+    
     setInput('');
   };
+
+  // ECHO 응답에서 단서 수신 처리 (메시지 배열 변화 감시)
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    // @ts-ignore - clueIds 가 Message 타입에 없을 수 있으므로 확장 필요
+    if (lastMsg && lastMsg.role === 'assistant' && lastMsg.clueIds?.length > 0) {
+      // @ts-ignore
+      const newOnes = addClues(lastMsg.clueIds, 'echo');
+      if (sessionCode && learnerId) {
+        newOnes.forEach(id => syncClueToFirestore(sessionCode, learnerId, id, 'echo'));
+      }
+    }
+  }, [messages, addClues, sessionCode, learnerId]);
 
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {

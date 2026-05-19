@@ -25,7 +25,7 @@ interface InterviewState {
   loadCatalog: () => Promise<void>;
   
   startInterview: (characterId: CharacterId) => void;
-  sendMessage: (userInput: string) => Promise<void>;
+  sendMessage: (userInput: string) => Promise<any>;
   dismissToast: (clueId: string) => void;
   resetInterview: () => void;
   resetGame: () => void;
@@ -160,11 +160,13 @@ export const useInterviewStore = create<InterviewState>()(
               },
             };
           });
+          return data;
         } catch (err: any) {
           set({ 
             isLoading: false, 
             error: err.message ?? 'AI 응답을 받지 못했습니다. 다시 시도해주세요.',
           });
+          return null;
         }
       },
       

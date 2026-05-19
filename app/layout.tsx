@@ -20,6 +20,8 @@ export const metadata: Metadata = {
 
 import EchoButton from "@/components/EchoButton";
 import EchoModal from "@/components/EchoModal";
+import InventoryButton from "@/components/InventoryButton";
+import ClueToast from "@/components/ClueToast";
 
 export default function RootLayout({
   children,
@@ -33,7 +35,9 @@ export default function RootLayout({
       >
         {children}
         <EchoButton />
+        <InventoryButton />
         <EchoModal />
+        <ClueToast />
       </body>
     </html>
   );

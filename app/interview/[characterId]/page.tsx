@@ -7,6 +7,9 @@ import { useRouter } from 'next/navigation';
 import { CHARACTERS, getCharacterImage, CharacterId } from '@/lib/character-assets';
 import { useInterviewStore, MAX_TURNS_PER_CHARACTER } from '@/store/interview-store';
 import { usePlayerStore } from '@/store/player-store';
+import { useClueStore } from '@/store/clue-store';
+import { syncClueToFirestore } from '@/lib/firestore-clue';
+import { getCluesByOwner } from '@/lib/clue-catalog';
 
 export default function InterviewPage({ params }: { params: { characterId: string } }) {
   const router = useRouter();
@@ -19,15 +22,14 @@ export default function InterviewPage({ params }: { params: { characterId: strin
     currentEmotion,
     isLoading,
     error,
-    toastQueue,
     isUnlocked,
     startInterview,
     sendMessage,
-    dismissToast,
-    clueCatalog,
-    loadCatalog,
     isCharacterExhausted,
   } = useInterviewStore();
+  
+  const { addClues, collected } = useClueStore();
+  const { sessionCode, learnerId } = usePlayerStore();
 
   const messages = allMessages[characterId] || [];
   const currentTurns = characterTurns[characterId] || 0;
@@ -36,10 +38,9 @@ export default function InterviewPage({ params }: { params: { characterId: strin
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // 단서 카탈로그 로드 및 초기화
-  useEffect(() => {
-    loadCatalog();
-  }, [loadCatalog]);
+  // 캐릭터별 보유 단서 수 계산 (인디케이터용)
+  const myClues = getCluesByOwner(characterId);
+  const collectedFromMe = collected.filter(c => c.source === characterId).length;
 
   // 캐릭터 유효성 검사 및 초기화
   useEffect(() => {
@@ -65,16 +66,6 @@ export default function InterviewPage({ params }: { params: { characterId: strin
     }
   }, [messages, isLoading]);
 
-  // 토스트 자동 제거
-  useEffect(() => {
-    if (toastQueue.length > 0) {
-      const timer = setTimeout(() => {
-        dismissToast(toastQueue[0].id);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toastQueue, dismissToast]);
-
   if (!charInfo) return null;
 
   const handleSend = async (e?: React.FormEvent) => {
@@ -82,12 +73,15 @@ export default function InterviewPage({ params }: { params: { characterId: strin
     if (!input.trim() || isLoading || isExhausted) return;
     const currentInput = input;
     setInput('');
-    await sendMessage(currentInput);
-  };
-
-  const getClueName = (clueId: string) => {
-    const meta = clueCatalog.find(c => c.id === clueId);
-    return meta?.name ?? clueId;
+    
+    const data = await sendMessage(currentInput);
+    
+    if (data && data.clueIds && data.clueIds.length > 0) {
+      const newOnes = addClues(data.clueIds, characterId);
+      if (sessionCode && learnerId) {
+        newOnes.forEach(id => syncClueToFirestore(sessionCode, learnerId, id, characterId));
+      }
+    }
   };
 
   return (
@@ -104,11 +98,12 @@ export default function InterviewPage({ params }: { params: { characterId: strin
             {charInfo.name}
             <span className="text-[var(--text-muted)] font-normal text-sm">{charInfo.role}</span>
           </h1>
+          <div className="ml-4 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50 text-[10px] text-zinc-400 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            수집된 단서: <span className="text-amber-500 font-bold">{collectedFromMe} / {myClues.length}</span>
+          </div>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/inventory" className="text-[var(--text-secondary)] hover:text-[var(--accent-amber)] transition-colors text-sm flex items-center gap-2">
-            📋 추리 노트
-          </Link>
           <div className="flex items-center gap-2">
             <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-[var(--font-mono)]">Interview</span>
             <span className={`font-bold font-[var(--font-mono)] ${isExhausted ? 'text-red-500' : 'text-[var(--accent-amber)]'}`}>
@@ -232,23 +227,6 @@ export default function InterviewPage({ params }: { params: { characterId: strin
           </div>
         </div>
       </main>
-
-      {/* 단서 토스트 알림 */}
-      <div className="fixed top-20 right-8 z-50 flex flex-col gap-4">
-        {toastQueue.map((clue) => (
-          <div 
-            key={clue.id}
-            onClick={() => dismissToast(clue.id)}
-            className="bg-[var(--paper-base)] text-[var(--paper-ink)] p-4 shadow-2xl border-l-4 border-[var(--accent-amber)] animate-slide-in cursor-pointer max-w-[300px]"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-widest text-[var(--accent-amber)]">📎 New Clue</span>
-              <span className="text-[var(--font-mono)] text-xs opacity-50">{clue.id}</span>
-            </div>
-            <p className="font-[var(--font-serif)] text-sm">새로운 단서를 확보했습니다: <span className="font-bold">{getClueName(clue.id)}</span></p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

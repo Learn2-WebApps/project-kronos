@@ -60,6 +60,8 @@ export const useEchoStore = create<EchoState>()(
             role: 'assistant',
             content: data.content,
             timestamp: Date.now(),
+            // @ts-ignore
+            clueIds: data.clueIds,
           };
           
           set(s => ({ messages: [...s.messages, aiMsg], isLoading: false }));
