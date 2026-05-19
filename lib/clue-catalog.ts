@@ -43,7 +43,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '제보 메일 발신 위치',
     name: '제보 메일 발신 위치',
-    content: '메일 발신 위치는 정민호 팀장의 자택 근처 카페로 특정되었습니다.',
+    content: '메일 발신 위치는 용의자 중 한 명의 자택 근처 카페로 특정되었습니다.',
     owners: ['kang-hyerin'],
     triggers: ['자택 근처', '집 근처 카페', '카페 위치', '자택 부근'],
     level: 2
@@ -71,9 +71,9 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'F-06': {
     id: 'F-06',
     type: 'F',
-    title: '정민호의 직속 발탁',
-    name: '정민호의 직속 발탁',
-    content: '윤서경 본부장 승진 직후, 정민호 팀장이 그녀의 직속으로 발탁되었습니다.',
+    title: '특정 인물의 직속 발탁',
+    name: '특정 인물의 직속 발탁',
+    content: '윤서경 본부장 승진 직후, 특정 기획팀 인원이 그녀의 직속으로 발탁되었습니다.',
     owners: ['han-jihun', 'kang-hyerin', 'oh-sera', 'jung-minho', 'yoon-seokyung'],
     triggers: ['본부장 승진', '윤서경 승진', '직속 발탁', '인사 발령'],
     level: 1
@@ -91,21 +91,21 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'F-27': {
     id: 'F-27',
     type: 'F',
-    title: '정민호의 자료 접근 권한',
-    name: '정민호의 자료 접근 권한',
-    content: '정민호는 임원 보좌 업무를 겸하며 신제품 기획 자료에 대한 이례적인 열람 권한을 보유했었습니다.',
+    title: '내부 기획 자료 접근 권한',
+    name: '내부 기획 자료 접근 권한',
+    content: '사건 관련 인물 중 한 명은 임원 보좌 업무를 겸하며 신제품 기획 자료에 대한 이례적인 열람 권한을 보유했었습니다.',
     owners: ['kang-hyerin', 'jung-minho'],
     triggers: ['정민호 권한', '신제품 자료 접근', '기획 자료', '열람 권한'],
     level: 2
   },
 
-  // --- 정민호 관련 ---
+  // --- 용의자 관련 정보 ---
   'F-07': {
     id: 'F-07',
     type: 'F',
-    title: '정민호의 외부 접촉 기록',
-    name: '정민호의 외부 접촉 기록',
-    content: '작년 가을부터 정민호 팀장에게 외부 헤드헌터들의 비공식 접촉이 있었다는 보고가 있었습니다.',
+    title: '외부 접촉 기록',
+    name: '외부 접촉 기록',
+    content: '작년 가을부터 특정 용의자에게 외부 헤드헌터들의 비공식 접촉이 있었다는 보고가 있었습니다.',
     owners: ['kang-hyerin'],
     triggers: ['헤드헌터', '비공식 접촉', '외부 접촉', '스카우트'],
     level: 1
@@ -115,7 +115,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '컨퍼런스 참석 사실',
     name: '컨퍼런스 참석 사실',
-    content: '정민호 팀장은 4월 업계 컨퍼런스에 회사 대표로 참석하여 오세라 부사장을 만났습니다.',
+    content: '사건 관련 인물 중 한 명은 4월 업계 컨퍼런스에 회사 대표로 참석하여 오세라 부사장을 만났습니다.',
     owners: ['kang-hyerin'],
     triggers: ['컨퍼런스', '노바테크', '대표 참석', '업계 행사'],
     level: 1
@@ -125,7 +125,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'KEY',
     title: '임원 제외 사유 문의',
     name: '임원 제외 사유 문의',
-    content: '정민호가 강혜린 차장에게 본인이 임원 후보에서 제외된 사유를 비공식적으로 문의했었습니다.',
+    content: '특정 용의자가 인사팀에 본인이 임원 후보에서 제외된 사유를 비공식적으로 문의했었습니다.',
     owners: ['kang-hyerin'],
     triggers: ['5개월 전', '한 상무 배제', '비공식 문의', '정민호가 물어봤'],
     level: 2
@@ -135,7 +135,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '비밀 회동 (삼성동 호텔)',
     name: '비밀 회동 (삼성동 호텔)',
-    content: '사건 당일 밤, 정민호와 오세라는 삼성동 호텔 라운지에서 비밀리에 회동했습니다.',
+    content: '사건 당일 밤, 특정 인물과 오세라 부사장은 삼성동 호텔 라운지에서 비밀리에 회동했습니다.',
     owners: ['jung-minho'],
     triggers: ['오세라 만남', '호텔 라운지', '비밀 회동', '삼성동'],
     level: 3,
@@ -144,21 +144,21 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'F-24': {
     id: 'F-24',
     type: 'F',
-    title: '정민호 귀가 시각 추정',
-    name: '정민호 귀가 시각 추정',
-    content: '메일 발송 시각을 고려할 때 정민호는 약 23:30경에 자택 근처에 도착한 것으로 보입니다.',
+    title: '귀가 시각 추정',
+    name: '귀가 시각 추정',
+    content: '메일 발송 시각을 고려할 때 해당 발신자는 약 23:30경에 자택 근처에 도착한 것으로 보입니다.',
     owners: ['echo'],
     triggers: ['23:30', '귀가 시각', '11시 30분', '도착 시간'],
     level: 2
   },
 
-  // --- 정민호 거짓말 ---
+  // --- 진술 모순 ---
   'L-01': {
     id: 'L-01',
     type: 'L',
-    title: '식사 종료 시각 거짓말',
-    name: '식사 종료 시각 거짓말',
-    content: '정민호는 사건 당일 밤 11시까지 한지훈 상무와 식사했다고 주장하고 있습니다.',
+    title: '식사 종료 시각 모순',
+    name: '식사 종료 시각 모순',
+    content: '한 용의자는 사건 당일 밤 11시까지 한지훈 상무와 식사했다고 주장하고 있습니다.',
     owners: ['jung-minho'],
     triggers: ['11시', '23시', '11시까지', '늦게까지 같이'],
     level: 1
@@ -168,7 +168,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'L',
     title: '식사 장소 진술 번동',
     name: '식사 장소 진술 번동',
-    content: '정민호는 식사 장소를 강남이라고 했다가 여의도라고 하는 등 진술이 엇갈리고 있습니다.',
+    content: '특정 인물의 식사 장소 진술이 강남과 여의도를 오가는 등 엇갈리고 있습니다.',
     owners: ['jung-minho'],
     triggers: ['강남', '여의도', '장소 변경', '장소 진술'],
     level: 2
@@ -178,7 +178,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'L',
     title: '오세라와 면식 부인',
     name: '오세라와 면식 부인',
-    content: '정민호는 오세라 부사장과 일면식도 없는 사이라고 주장합니다.',
+    content: '해당 인물은 오세라 부사장과 일면식도 없는 사이라고 주장합니다.',
     owners: ['jung-minho', 'oh-sera'],
     triggers: ['일면식 없다', '모르는 사람', '오세라 누구', '처음 듣는'],
     level: 1
@@ -188,7 +188,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'KEY',
     title: '위조 영수증 개수 누설',
     name: '위조 영수증 개수 누설',
-    content: '정민호가 비공개 정보인 위조 영수증 개수(4장)를 무심결에 언급했습니다.',
+    content: '수사 과정 중 한 인물이 비공개 정보인 위조 영수증 개수(4장)를 무심결에 언급했습니다.',
     owners: ['jung-minho'],
     triggers: ['4장', '네 장', '영수증 4', '넉 장'],
     level: 2
@@ -196,9 +196,9 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'L-07': {
     id: 'L-07',
     type: 'L',
-    title: '귀가 동선 거짓말',
-    name: '귀가 동선 거짓말',
-    content: '정민호는 식사 후 곧장 집으로 귀가했다고 주장하고 있습니다.',
+    title: '귀가 동선 불일치',
+    name: '귀가 동선 불일치',
+    content: '식사 후 곧장 집으로 귀가했다는 진술과 실제 메일 발송 기록 사이에 시차가 존재합니다.',
     owners: ['jung-minho'],
     triggers: ['곧장 귀가', '바로 집에', '헤어진 후 바로', '바로 갔습니다'],
     level: 1
@@ -210,7 +210,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '임원 제외 사유',
     name: '임원 제외 사유',
-    content: '한지훈 상무는 정민호에게 아직 "더 다듬어질 시간이 필요하다"고 판단했었습니다.',
+    content: '한지훈 상무는 당시 후보자 중 한 명에게 아직 "더 다듬어질 시간이 필요하다"고 판단했었습니다.',
     owners: ['han-jihun'],
     triggers: ['더 다듬어져야', '임원 제외 사유', '후보 제외', '아직 부족'],
     level: 1
@@ -218,9 +218,9 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'F-11': {
     id: 'F-11',
     type: 'F',
-    title: '정민호 육성 계획',
-    name: '정민호 육성 계획',
-    content: '한지훈은 사실 본부장 승진 후 정민호를 자신의 후계자로 키울 계획을 가지고 있었습니다.',
+    title: '인재 육성 계획',
+    name: '인재 육성 계획',
+    content: '한지훈은 사실 본부장 승진 후 자신의 부하 직원을 후계자로 직접 키울 계획을 가지고 있었습니다.',
     owners: ['han-jihun'],
     triggers: ['직접 키울 계획', '본부장 승진 후', '정민호 육성', '후계자'],
     level: 1
@@ -230,7 +230,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '실제 식사 종료 시각',
     name: '실제 식사 종료 시각',
-    content: '사건 당일 한지훈 상무와 정민호 팀장은 저녁 9시에 식사를 마치고 헤어졌습니다.',
+    content: '사건 당일 한지훈 상무와 동행자는 저녁 9시에 식사를 마치고 헤어졌습니다.',
     owners: ['han-jihun'],
     triggers: ['9시', '21시', '9시쯤', '저녁 9시', '헤어진 게 9시'],
     level: 2
@@ -248,9 +248,9 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'F-14': {
     id: 'F-14',
     type: 'F',
-    title: '정민호에 대한 신뢰',
-    name: '정민호에 대한 신뢰',
-    content: '한지훈 상무는 현재까지도 정민호가 자신을 배신했을 것이라고는 상상도 하지 못하고 있습니다.',
+    title: '인물에 대한 신뢰',
+    name: '인물에 대한 신뢰',
+    content: '한지훈 상무는 현재까지도 자신의 주변 인물이 자신을 배신했을 것이라고는 상상도 하지 못하고 있습니다.',
     owners: ['han-jihun'],
     triggers: ['의심하지 않음', '절대 아님', '믿고 있는', '정 팀장이 그럴 리'],
     level: 1
@@ -356,7 +356,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'T',
     title: '면식 정도 진술',
     name: '면식 정도 진술',
-    content: '오세라는 정민호 팀장과 4월에 잠깐 인사만 나눈 정도의 사이라고 주장합니다.',
+    content: '오세라는 특정 용의자와 4월에 잠깐 인사만 나눈 정도의 사이라고 주장합니다.',
     owners: ['oh-sera'],
     triggers: ['4월에 잠깐', '인사만', '거의 모르는', '면식만'],
     level: 1
@@ -366,7 +366,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'T',
     title: '압박 후 면식 시인',
     name: '압박 후 면식 시인',
-    content: '추궁 끝에 오세라는 컨퍼런스에서 정민호와 30분 정도 차를 마시며 대화했음을 시인했습니다.',
+    content: '추궁 끝에 오세라는 해당 인물과 30분 정도 차를 마시며 대화했음을 시인했습니다.',
     owners: ['oh-sera'],
     triggers: ['30분 정도', '차 한잔', '시인', '만나긴 했다'],
     level: 2
@@ -376,7 +376,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'T',
     title: '티타니아 무관 주장',
     name: '티타니아 무관 주장',
-    content: '오세라는 한지훈 사건과 티타니아는 아무런 연관이 없다고 강력히 주장하고 있습니다.',
+    content: '오세라 부사장은 한지훈 사건과 티타니아는 아무런 연관이 없다고 강력히 주장하고 있습니다.',
     owners: ['oh-sera'],
     triggers: ['우리 회사는 무관', '티타니아 무관', '사건 무관', '연관성 없다'],
     level: 1
@@ -396,7 +396,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'L',
     title: '영입 협상 부인',
     name: '영입 협상 부인',
-    content: '오세라는 정민호 팀장에게 어떤 영입 제안도 한 적이 없다고 거짓말하고 있습니다.',
+    content: '오세라는 특정 인물에게 어떤 영입 제안도 한 적이 없다고 거짓말하고 있습니다.',
     owners: ['oh-sera'],
     triggers: ['영입 협상 없었다', '제안 안 함', '협상 부인', '접촉 안 함'],
     level: 2
@@ -480,7 +480,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'KEY',
     title: '식사 시간 모순 확인',
     name: '식사 시간 모순 확인',
-    content: '한지훈과 정민호의 식사 종료 시각에 대한 진술이 정면으로 충돌합니다.',
+    content: '한지훈과 동행자의 식사 종료 시각에 대한 진술이 정면으로 충돌합니다.',
     owners: ['echo'],
     triggers: ['9시', '21시', '식사 종료', '헤어진 시간'],
     level: 2
@@ -490,7 +490,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'KEY',
     title: '2시간의 행적 공백',
     name: '2시간의 행적 공백',
-    content: '정민호가 한지훈과 헤어진 21:00부터 메일 발송 23:47 사이의 행적이 불분명합니다.',
+    content: '특정 인물이 한지훈과 헤어진 21:00부터 메일 발송 23:47 사이의 행적이 불분명합니다.',
     owners: ['echo'],
     triggers: ['공백', '2시간', '행적', '9시부터 11시'],
     level: 2
@@ -500,7 +500,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'KEY',
     title: '내부 유출자 확정',
     name: '내부 유출자 확정',
-    content: '티타니아의 제품 정보와 정민호의 권한을 종합할 때, 정민호가 신제품 정보를 유출한 내부자임이 확정되었습니다.',
+    content: '티타니아의 제품 정보와 용의자의 권한을 종합할 때, 내부 정보 유출자가 누구인지 특정되었습니다.',
     owners: ['echo'],
     triggers: ['헬리오스 유출', '기획 자료 유출', '오세라에게 넘긴'],
     level: 3
@@ -510,9 +510,9 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
   'T-01': {
     id: 'T-01',
     type: 'T',
-    title: '한지훈에 대한 옹호',
-    name: '한지훈에 대한 옹호',
-    content: '정민호 팀장은 한 상무님이 절대 그럴 분이 아니라며 겉으로 강력히 옹호하고 있습니다.',
+    title: '인물에 대한 옹호',
+    name: '인물에 대한 옹호',
+    content: '해당 팀장은 한 상무님이 절대 그럴 분이 아니라며 겉으로 강력히 옹호하고 있습니다.',
     owners: ['jung-minho'],
     triggers: ['절대 그럴 분', '옹호', '한 상무님은', '신뢰합니다'],
     level: 1

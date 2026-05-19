@@ -9,10 +9,9 @@ export default function EchoButton() {
   const openModal = useEchoStore((state) => state.openModal);
 
   // 제외 경로 처리
-  const excludedPaths = ['/entry', '/admin'];
-  if (excludedPaths.some(path => pathname.startsWith(path))) {
-    return null;
-  }
+  const HIDDEN_PATHS = ['/entry', '/admin'];
+  const isHidden = HIDDEN_PATHS.some(path => pathname?.startsWith(path));
+  if (isHidden) return null;
 
   return (
     <button

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useClueStore } from '@/store/clue-store';
 import { getClueById } from '@/lib/clue-catalog';
 
@@ -8,6 +9,7 @@ import { getClueById } from '@/lib/clue-catalog';
  * 신규 단서 획득 시 우상단에 표시되는 알림 토스트 컴포넌트입니다.
  */
 export default function ClueToast() {
+  const pathname = usePathname();
   const collected = useClueStore(s => s.collected);
   const markAsRead = useClueStore(s => s.markAsRead);
   const [queue, setQueue] = useState<string[]>([]);
@@ -41,6 +43,11 @@ export default function ClueToast() {
     
     return () => clearTimeout(timer);
   }, [queue, markAsRead]);
+
+  // 제외 경로 처리
+  const HIDDEN_PATHS = ['/entry', '/admin'];
+  const isHidden = HIDDEN_PATHS.some(p => pathname?.startsWith(p));
+  if (isHidden) return null;
 
   if (queue.length === 0) return null;
   

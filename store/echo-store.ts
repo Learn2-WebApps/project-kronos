@@ -99,9 +99,12 @@ export const useEchoStore = create<EchoState>()(
       closeModal: () => set({ isModalOpen: false }),
     }),
     {
-      name: 'kronos-echo-storage',
+      name: 'kronos-echo-store',
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ messages: state.messages, briefingShown: state.briefingShown }),
+      partialize: (state) => ({ 
+        messages: state.messages, 
+        briefingShown: state.briefingShown 
+      }),
     }
   )
 );

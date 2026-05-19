@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useEchoStore } from '@/store/echo-store';
 import { useClueStore } from '@/store/clue-store';
 import { syncClueToFirestore } from '@/lib/firestore-clue';
 import { usePlayerStore } from '@/store/player-store';
 
 export default function EchoModal() {
+  const pathname = usePathname();
   const { messages, isLoading, error, sendToEcho, isModalOpen, closeModal } = useEchoStore();
   const { getCollectedIds, addClues } = useClueStore();
   const { sessionCode, learnerId } = usePlayerStore();
@@ -15,25 +17,35 @@ export default function EchoModal() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // ... (스크롤 및 ESC 로직 동일)
+  // 자동 스크롤
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
+  // ESC 키로 닫기
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [closeModal]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading || trimmed.length > 200) return;
     
     const clueIds = getCollectedIds();
-    
-    // ECHO 에 메시지 전송 (기존 sendToEcho 를 확장하거나 내부에서 fetch 처리 확인 필요)
-    // 여기서는 기존 sendToEcho 가 clueIds 를 받는지 확인
     await sendToEcho(trimmed, clueIds);
-    
     setInput('');
   };
 
-  // ECHO 응답에서 단서 수신 처리 (메시지 배열 변화 감시)
+  // ECHO 응답에서 단서 수신 처리
   useEffect(() => {
     const lastMsg = messages[messages.length - 1];
-    // @ts-ignore - clueIds 가 Message 타입에 없을 수 있으므로 확장 필요
+    // @ts-ignore
     if (lastMsg && lastMsg.role === 'assistant' && lastMsg.clueIds?.length > 0) {
       // @ts-ignore
       const newOnes = addClues(lastMsg.clueIds, 'echo');
@@ -48,6 +60,13 @@ export default function EchoModal() {
       closeModal();
     }
   };
+
+  // 제외 경로 처리
+  const HIDDEN_PATHS = ['/entry', '/admin'];
+  const isHidden = HIDDEN_PATHS.some(p => pathname?.startsWith(p));
+  if (isHidden) return null;
+
+  if (!isModalOpen) return null;
 
   return (
     <div 
@@ -70,7 +89,7 @@ export default function EchoModal() {
             </h2>
           </div>
           <button 
-            onClick={closeModal}
+            onClick={(e) => { e.stopPropagation(); closeModal(); }}
             className="text-[var(--text-muted)] hover:text-white transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>

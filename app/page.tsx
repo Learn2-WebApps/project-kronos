@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { CHARACTERS, getCharacterImage, getCharacterOrder, CharacterId } from "@/lib/character-assets";
 import { useInterviewStore, MAX_TURNS_PER_CHARACTER } from "@/store/interview-store";
 import { usePlayerStore } from "@/store/player-store";
@@ -11,19 +11,26 @@ import { useEchoStore } from "@/store/echo-store";
 
 export default function Home() {
   const router = useRouter();
+  const pathname = usePathname();
+  const triggeredRef = useRef(false);
   const { isUnlocked, characterTurns, isCharacterExhausted } = useInterviewStore();
-  const { sessionCode, name, department, hasSubmitted } = usePlayerStore();
-  const { briefingShown, showBriefing } = useEchoStore();
+  const { sessionCode, name, department, learnerId, hasSubmitted } = usePlayerStore();
+  const { briefingShown, showBriefing, openModal } = useEchoStore();
   
   const order = getCharacterOrder();
   const hasStartedTutorial = isUnlocked('kang-hyerin'); // 한지훈과 1턴 이상 대화 시 해제됨
 
-  // 자동 브리핑 트리거
+  // 자동 브리핑 트리거 (중복 발동 방지 가드 강화)
   useEffect(() => {
-    if (sessionCode && !hasSubmitted && !briefingShown) {
-      showBriefing();
-    }
-  }, [sessionCode, hasSubmitted, briefingShown, showBriefing]);
+    if (pathname !== '/') return;
+    if (triggeredRef.current) return;
+    if (!sessionCode || !learnerId) return;
+    if (hasSubmitted || briefingShown) return;
+
+    triggeredRef.current = true;
+    showBriefing();
+    openModal();
+  }, [pathname, sessionCode, learnerId, hasSubmitted, briefingShown, showBriefing, openModal]);
 
   useEffect(() => {
     if (!sessionCode) {
