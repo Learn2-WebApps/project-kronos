@@ -66,14 +66,14 @@ export async function POST(req: NextRequest) {
 
     let aiCommentary = "";
     try {
-      const response = await model.generateContent({
+      const result = await model.generateContent({
         model: 'gemini-3-flash-preview',
         contents: [{ role: 'user', parts: [{ text: commentaryPrompt }] }],
         config: {
           temperature: 0.7,
         }
       });
-      aiCommentary = (response.text() || "").replace(/[*_`#]/g, '').trim();
+      aiCommentary = (result.text || "").replace(/[*_`#]/g, '').trim();
     } catch (err) {
       console.error('[evaluate] AI Commentary generation failed:', err);
       aiCommentary = `정답은 범인 정민호, 협력자 오세라입니다. 수집한 단서를 바탕으로 범행 시간대의 알리바이 모순을 다시 한번 확인해 보세요.`;

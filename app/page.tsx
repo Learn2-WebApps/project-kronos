@@ -7,14 +7,23 @@ import { useRouter } from "next/navigation";
 import { CHARACTERS, getCharacterImage, getCharacterOrder, CharacterId } from "@/lib/character-assets";
 import { useInterviewStore, MAX_TURNS_PER_CHARACTER } from "@/store/interview-store";
 import { usePlayerStore } from "@/store/player-store";
+import { useEchoStore } from "@/store/echo-store";
 
 export default function Home() {
   const router = useRouter();
   const { isUnlocked, characterTurns, isCharacterExhausted } = useInterviewStore();
   const { sessionCode, name, department, hasSubmitted } = usePlayerStore();
+  const { briefingShown, showBriefing } = useEchoStore();
   
   const order = getCharacterOrder();
   const hasStartedTutorial = isUnlocked('kang-hyerin'); // 한지훈과 1턴 이상 대화 시 해제됨
+
+  // 자동 브리핑 트리거
+  useEffect(() => {
+    if (sessionCode && !hasSubmitted && !briefingShown) {
+      showBriefing();
+    }
+  }, [sessionCode, hasSubmitted, briefingShown, showBriefing]);
 
   useEffect(() => {
     if (!sessionCode) {
@@ -149,21 +158,6 @@ export default function Home() {
       >
         Instructor Access
       </Link>
-
-      {/* 에코 마스코트 (ECHO 진입) */}
-      <Link href="/echo" className="fixed bottom-8 right-8 z-30 transition-transform hover:scale-110 active:scale-95 group">
-        <div className="relative w-24 h-24 rounded-full border-2 border-[var(--accent-amber)] bg-[var(--bg-elevated)] shadow-[0_0_32px_rgba(212,165,116,0.3)] overflow-hidden">
-          <Image
-            src="/characters/echo.png"
-            alt="ECHO"
-            fill
-            className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-          />
-        </div>
-        <div className="absolute -top-1 -left-1 bg-red-500 border-2 border-[var(--bg-base)] text-[8px] font-bold text-white px-2 py-0.5 rounded-full uppercase tracking-tighter animate-pulse">
-          ECHO Active
-        </div>
-      </Link>
-    </main>
-  );
-}
+      </main>
+      );
+      }

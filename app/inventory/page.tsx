@@ -109,25 +109,10 @@ export default function InventoryPage() {
             />
           );
         })}
-      </div>
-      
-      {/* 우하단 에코 버튼 */}
-      <Link 
-        href="/echo"
-        className="fixed bottom-12 right-12 z-20 group"
-      >
-        <div className="relative w-24 h-24 rounded-full border-4 border-black bg-white shadow-2xl overflow-hidden transition-transform group-hover:scale-110 active:scale-95">
-          <Image src="/characters/echo.png" alt="ECHO" fill className="object-cover" />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
-        <div className="absolute -top-2 -left-2 bg-black text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-          Consult Echo
         </div>
-      </Link>
-    </div>
-  );
-}
-
+        );
+        }
 function ClueCard({ clue, isFound, cat }: { clue: ClueMetadata; isFound: boolean; cat: { bg: string; label: string; text: string } }) {
   const [expanded, setExpanded] = useState(false);
   

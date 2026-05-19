@@ -213,8 +213,14 @@ export default function InterviewPage({ params }: { params: { characterId: strin
                 }}
                 placeholder={isExhausted ? "대화 한도 도달 - 더 이상 질문할 수 없습니다" : `${charInfo.name}에게 질문을 입력하세요...`}
                 disabled={isLoading || isExhausted}
+                maxLength={200}
                 className="w-full bg-[var(--bg-base)] border border-[var(--border-subtle)] rounded-sm p-4 pr-24 min-h-[80px] max-h-[200px] resize-none focus:outline-none focus:border-[var(--accent-amber)] transition-colors disabled:opacity-50"
               />
+              <div className="absolute top-2 right-4 flex flex-col items-end gap-1">
+                <span className={`text-[10px] font-[var(--font-mono)] ${input.length >= 180 ? 'text-[var(--accent-amber)]' : 'text-[var(--text-muted)]'}`}>
+                  {input.length} / 200
+                </span>
+              </div>
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading || isExhausted}
@@ -226,19 +232,6 @@ export default function InterviewPage({ params }: { params: { characterId: strin
           </div>
         </div>
       </main>
-
-      {/* 에코 마스코트 */}
-      <Link href="/echo" className="fixed bottom-8 right-8 z-30 transition-transform hover:scale-110 active:scale-95 group">
-        <div className="relative w-20 h-20 rounded-full border-2 border-[var(--accent-amber)] bg-[var(--bg-elevated)] shadow-[0_0_20px_rgba(212,165,116,0.3)] overflow-hidden">
-          <Image
-            src="/characters/echo.png"
-            alt="ECHO"
-            fill
-            className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-          />
-        </div>
-        <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-[var(--bg-base)] rounded-full animate-pulse" />
-      </Link>
 
       {/* 단서 토스트 알림 */}
       <div className="fixed top-20 right-8 z-50 flex flex-col gap-4">

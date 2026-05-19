@@ -68,8 +68,11 @@ export async function POST(req: NextRequest) {
     const cleanedRawText = cleanText(rawText);
     const parsed = parseAIResponse(cleanedRawText);
     
+    // 길이 제한 200자
+    const finalContent = parsed.content.slice(0, 200);
+    
     // 키워드 매칭 백업 (AI가 <clues> 태그 빠뜨려도 자동 감지)
-    const keywordClues = detectCluesByKeywords(parsed.content);
+    const keywordClues = detectCluesByKeywords(finalContent);
     const allClueIds = Array.from(new Set([...parsed.clueIds, ...keywordClues]));
     
     // 현재 캐릭터의 단서 또는 공통 단서만 필터링
@@ -79,7 +82,7 @@ export async function POST(req: NextRequest) {
     });
     
     const result: ChatResponse = {
-      content: parsed.content,
+      content: finalContent,
       emotion: parsed.emotion,
       clueIds: validClueIds,
       raw: cleanedRawText,
