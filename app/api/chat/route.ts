@@ -72,6 +72,13 @@ ${availableEmotions.join(", ")}
 
 표정 태그는 학습자에게 보이지 않는다. 응답 내용과 일치해야 한다.
 ※ 'angry' 표정은 사용 금지 (시나리오 전용).
+
+[응답 길이 지침]
+응답은 250~280자 범위로 작성하세요.
+- 너무 짧으면 학습자가 정보를 얻기 어렵고, 너무 길면 부자연스럽습니다.
+- 2~4문장이 이상적입니다.
+- <emotion>과 <clues> 태그는 글자 수에 포함하지 않습니다.
+- 반복적인 부인 문구는 피하고, 다양한 표현을 사용하세요.
 `;
 
     // 런타임 검증: 핵심 사실 주입 여부 확인
@@ -124,9 +131,12 @@ ${availableEmotions.join(", ")}
     const { clean: finalText, emotion } = parseEmotionTag(textWithoutClues);
     
     const cleanedContent = cleanMarkdown(finalText);
-    
-    // 최종 응답 텍스트 (길이 제한 200자)
-    const finalContent = cleanedContent.slice(0, 200);
+
+    // 목표 250~280자, 300자 초과 시에만 잘라내기 (여유 임계값)
+    if (cleanedContent.length > 280) {
+      console.warn(`[chat] response length ${cleanedContent.length} exceeds 280 chars (character: ${characterId})`);
+    }
+    const finalContent = cleanedContent.slice(0, 300);
     
     const result: ChatResponse = {
       content: finalContent,

@@ -250,7 +250,7 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     type: 'F',
     title: '인물에 대한 신뢰',
     name: '인물에 대한 신뢰',
-    content: '한지훈 상무는 현재까지도 자신의 주변 인물이 자신을 배신했을 것이라고는 상상도 하지 못하고 있습니다.',
+    content: '한지훈 상무는 자신이 이런 억울한 혐의를 받게 되리라고는 상상조차 하지 못하고 있습니다. 회사와 동료들에 대한 신뢰가 여전히 깊습니다.',
     owners: ['han-jihun'],
     triggers: ['의심하지 않음', '절대 아님', '믿고 있는', '정 팀장이 그럴 리'],
     level: 1
@@ -576,6 +576,36 @@ export const CLUE_CATALOG: Record<string, ClueDefinition> = {
     owners: ['han-jihun'],
     triggers: ['정민호', '팀 분위기', '최근 변화'],
     level: 1
+  },
+  'F-33': {
+    id: 'F-33',
+    type: 'F',
+    title: '티타니아 유사 제품 출시',
+    name: '티타니아 유사 제품 출시',
+    content: '얼마 전 티타니아가 노바테크와 유사한 제품을 먼저 출시하여 업계에서 화제가 되었다. 표절이나 정보 유출 가능성에 대한 의혹이 제기됐지만 확실한 증거는 없다.',
+    owners: ['han-jihun'],
+    triggers: ['티타니아', '경쟁사', '제품 출시', '요즘 시장', '업계 상황'],
+    level: 1
+  },
+  'F-34': {
+    id: 'F-34',
+    type: 'F',
+    title: '프로토타입 사양 유사성',
+    name: '프로토타입 사양 유사성',
+    content: '티타니아의 신제품이 노바테크 프로토타입과 세부 사양까지 유사해서 마케팅팀 내에서도 우려의 목소리가 있었다.',
+    owners: ['yoon-seokyung'],
+    triggers: ['티타니아', '신제품', '제품 유사성', '프로토타입', '마케팅'],
+    level: 1
+  },
+  'F-35': {
+    id: 'F-35',
+    type: 'F',
+    title: '내부 유출 조사 요구',
+    name: '내부 유출 조사 요구',
+    content: '회사 내부에서 정보 유출 가능성을 조사해야 한다는 의견이 일부 부서에서 제기됐다는 사실을 인사팀에서 인지하고 있다.',
+    owners: ['kang-hyerin'],
+    triggers: ['내부 유출', '정보 유출', '내부 조사', '제보', '보안'],
+    level: 2
   }
 };
 

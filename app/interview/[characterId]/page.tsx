@@ -95,7 +95,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
     <div className="flex h-screen bg-[var(--bg-base)] text-[var(--text-primary)] overflow-hidden font-[var(--font-main)]">
       <PreloadCharacterEmotions characterId={characterId} />
       {/* 상단 바 */}
-      <header className="fixed top-0 left-0 right-0 h-[56px] border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/80 backdrop-blur-md z-40 flex items-center justify-between px-6">
+      <header className="fixed top-0 left-0 right-0 h-[56px] border-b border-[var(--border-subtle)] bg-black/80 backdrop-blur z-30 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Link href="/" className="text-[var(--text-secondary)] hover:text-white transition-colors">
             ← 목록으로
@@ -106,21 +106,21 @@ export default function InterviewPage({ params }: { params: { characterId: strin
             {charInfo.name}
             <span className="text-[var(--text-muted)] font-normal text-sm">{charInfo.role}</span>
           </h1>
-          <div className="ml-4 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50 text-[10px] text-zinc-400 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-            수집된 단서: <span className="text-amber-500 font-bold">{collectedFromMe} / {myClues.length}</span>
+          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-sm border font-bold whitespace-nowrap transition-colors ${
+            turnsLeft <= 1 ? 'bg-red-900/60 text-red-200 border-red-500/60' :
+            turnsLeft <= 3 ? 'bg-yellow-900/60 text-yellow-200 border-yellow-500/50' :
+            'bg-gray-800 text-gray-200 border-gray-600'
+          }`}>
+            <span>💬</span>
+            <span className="font-[var(--font-mono)]">
+              {turnsLeft}/{MAX_TURNS_PER_CHARACTER}
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-sm border transition-colors ${
-            turnsLeft <= 1 ? 'border-red-500/50 bg-red-900/20 text-red-400' :
-            turnsLeft <= 3 ? 'border-yellow-500/50 bg-yellow-900/20 text-yellow-400' :
-            'border-zinc-700 bg-zinc-800 text-zinc-300'
-          }`}>
-            <span className="text-[10px] uppercase tracking-widest font-bold">💬 남은 질문</span>
-            <span className="font-bold font-[var(--font-mono)]">
-              {turnsLeft} / {MAX_TURNS_PER_CHARACTER}
-            </span>
+          <div className="px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50 text-[10px] text-zinc-400 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            수집된 단서: <span className="text-amber-500 font-bold">{collectedFromMe} / {myClues.length}</span>
           </div>
         </div>
       </header>
@@ -128,7 +128,7 @@ export default function InterviewPage({ params }: { params: { characterId: strin
       {/* 메인 레이아웃 */}
       <main className="flex flex-1 pt-[56px]">
         {/* 좌측: 캐릭터 일러스트 */}
-        <div className="w-1/2 relative bg-gradient-to-b from-[var(--bg-elevated)] to-black flex items-end justify-center overflow-hidden">
+        <div className="w-1/2 relative z-10 bg-gradient-to-b from-[var(--bg-elevated)] to-black flex items-end justify-center overflow-hidden">
           {/* 캐릭터 컬러 후광 */}
           <div 
             className="absolute bottom-0 w-[120%] h-[60%] blur-[120px] opacity-20 pointer-events-none"
@@ -153,9 +153,9 @@ export default function InterviewPage({ params }: { params: { characterId: strin
         {/* 우측: 채팅창 */}
         <div className="w-1/2 flex flex-col border-l border-[var(--border-subtle)] bg-[var(--bg-base)] relative">
           {/* 메시지 영역 */}
-          <div 
+          <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth"
+            className="relative z-[5] flex-1 overflow-y-auto p-8 space-y-6 scroll-smooth"
           >
             {messages.length === 0 && !isLoading && (
               <div className="h-full flex flex-col items-center justify-center text-center p-8 text-[var(--text-muted)]">
@@ -195,7 +195,10 @@ export default function InterviewPage({ params }: { params: { characterId: strin
           </div>
 
           {/* 입력 영역 */}
-          <div className="p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+          <div className="relative z-20 p-6 border-t border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+            <div className={`mb-2 text-xs ${turnsLeft <= 3 ? 'text-yellow-400' : 'text-gray-400'}`}>
+              남은 질문: {turnsLeft}회
+            </div>
             {error && (
               <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 text-red-200 text-sm rounded-sm flex justify-between items-center">
                 <span>{error}</span>
